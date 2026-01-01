@@ -36,29 +36,27 @@
         /* Photo Preview Styling */
         .photo-preview-img { max-width: 90vw; max-height: 70vh; object-fit: contain; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
         
-        /* Badge Styles */
-        .badge-base { padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 4px; transition: all 0.2s; white-space: nowrap; }
-        .badge-wa { background-color: #f0fdf4; color: #166534; border: 1px solid #dcfce7; position: relative; }
-        .badge-wa:hover { background-color: #dcfce7; transform: translateY(-2px); box-shadow: 0 4px 12px -2px rgba(22, 101, 52, 0.2); }
-        
-        /* Tooltip Styling */
+        /* Tooltip Styling - FIXED for Visibility */
+        [data-tooltip] { position: relative; }
         [data-tooltip]:before {
             content: attr(data-tooltip);
             position: absolute;
             bottom: 125%;
             left: 50%;
             transform: translateX(-50%) translateY(10px);
-            padding: 4px 10px;
+            padding: 6px 12px;
             background: #1e293b;
             color: white;
-            font-size: 9px;
-            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 8px;
             white-space: nowrap;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
-            z-index: 50;
+            z-index: 9999; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
         }
         [data-tooltip]:hover:before {
             opacity: 1;
@@ -66,9 +64,21 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* Card Hover Effect */
-        .participant-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .participant-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border-color: #dbeafe; }
+        /* Card Hover Effect - Removed overflow-hidden to allow tooltips */
+        .participant-card { 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            overflow: visible !important; 
+        }
+        .participant-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); 
+            border-color: #dbeafe; 
+        }
+        
+        /* Badge Styles */
+        .badge-base { padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 4px; transition: all 0.2s; white-space: nowrap; }
+        .badge-wa { background-color: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+        .badge-wa:hover { background-color: #dcfce7; transform: translateY(-2px); }
         
         /* Proper Case Branding */
         .edi-brata-tag { color: #fbbf24; font-weight: 700; border-left: 2px solid rgba(255,255,255,0.3); padding-left: 10px; margin-left: 10px; letter-spacing: 0.01em; }
@@ -208,7 +218,7 @@
 
                 <div class="flex items-center gap-2 w-full lg:w-auto flex-wrap justify-center font-bold">
                     <button onclick="openFormModal()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-blue-700 text-[10px] shadow-sm transition-all whitespace-nowrap uppercase tracking-wider"><i class="fas fa-plus mr-1"></i>Tambah</button>
-                    <button onclick="exportToExcel()" class="bg-green-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-green-700 text-[10px] shadow-sm transition-all whitespace-nowrap uppercase tracking-wider"><i class="fas fa-file-excel mr-1"></i>Ekspor</button>
+                    <button onclick="openExportModal()" class="bg-green-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-green-700 text-[10px] shadow-sm transition-all whitespace-nowrap uppercase tracking-wider"><i class="fas fa-file-excel mr-1"></i>Ekspor</button>
                     <button onclick="logoutAdmin()" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl font-bold hover:bg-red-100 text-[10px] transition-all whitespace-nowrap uppercase tracking-wider"><i class="fas fa-power-off mr-1"></i>Logout</button>
                 </div>
             </div>
@@ -312,6 +322,39 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center opacity-0 pointer-events-none z-[160] font-medium">
+        <div class="modal-overlay absolute w-full h-full bg-slate-900/60 backdrop-blur-sm" onclick="closeExportModal()"></div>
+        <div class="modal-container bg-white w-11/12 md:max-w-xs mx-auto rounded-[2rem] shadow-2xl z-50 overflow-hidden">
+            <div class="p-8 text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 mx-auto mb-6">
+                    <i class="fas fa-file-export text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-black tracking-tighter mb-2">Pilih Format Ekspor</h2>
+                <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-8">Pilih ekstensi file</p>
+                
+                <div class="space-y-3">
+                    <button onclick="triggerExport('xls')" class="w-full py-4 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-2xl flex items-center justify-between px-6 transition-all group">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-file-excel text-green-600 text-lg"></i>
+                            <span class="font-black text-slate-700">Format .XLS</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-slate-300 group-hover:text-blue-500 transition-colors"></i>
+                    </button>
+                    <button onclick="triggerExport('xlsx')" class="w-full py-4 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-2xl flex items-center justify-between px-6 transition-all group">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-file-excel text-green-500 text-lg"></i>
+                            <span class="font-black text-slate-700">Format .XLSX</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-slate-300 group-hover:text-blue-500 transition-colors"></i>
+                    </button>
+                </div>
+                
+                <button onclick="closeExportModal()" class="mt-8 text-slate-400 font-bold text-xs uppercase tracking-widest hover:text-red-500 transition-colors">Tutup</button>
             </div>
         </div>
     </div>
@@ -425,11 +468,23 @@
             document.body.classList.remove('modal-active');
         };
 
+        // --- EXPORT MODAL ACTIONS ---
+        window.openExportModal = () => {
+            document.getElementById('exportModal').classList.remove('opacity-0', 'pointer-events-none');
+            document.body.classList.add('modal-active');
+        };
+
+        window.closeExportModal = () => {
+            document.getElementById('exportModal').classList.add('opacity-0', 'pointer-events-none');
+            document.body.classList.remove('modal-active');
+        };
+
         // --- GLOBAL ESC KEY LISTENER ---
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeFormModal();
                 closePhotoPreview();
+                closeExportModal();
             }
         });
 
@@ -530,7 +585,7 @@
                     </div>`).join("") : '<p class="text-[10px] italic text-gray-300 mt-1 pl-1 font-medium">Sendiri</p>';
 
                 html += `
-                    <div class="participant-card bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col h-full relative overflow-hidden group">
+                    <div class="participant-card bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col h-full relative group">
                         <div class="flex gap-4 mb-4">
                             <img src="${getPhotoSource(p)}" 
                                  onclick="openPhotoPreview(this.src, '${escapeJS(p.nama)}')" 
@@ -543,7 +598,7 @@
                                 <div class="flex flex-wrap gap-1.5 mt-3 items-center">
                                     <span class="text-[9px] bg-slate-100 px-2.5 py-0.5 rounded-full font-bold">Kaos: ${p.ukuran}</span>
                                     <span class="text-[9px] ${p.jk==='L'?'bg-blue-50 text-blue-700':'bg-pink-50 text-pink-700'} px-2.5 py-0.5 rounded-full font-bold">${p.jk==='L'?'Laki-Laki':'Perempuan'}</span>
-                                    <a href="${getWALink(p.wa)}" target="_blank" data-tooltip="Klik untuk Kirim Pesan WA" class="badge-base badge-wa"><i class="fab fa-whatsapp"></i> Hubungi</a>
+                                    <a href="${getWALink(p.wa)}" target="_blank" data-tooltip="Klik Kirim Pesan WA" class="badge-base badge-wa"><i class="fab fa-whatsapp"></i> Hubungi</a>
                                 </div>
                             </div>
                         </div>
@@ -705,16 +760,93 @@
             }
         };
 
-        window.exportToExcel = () => {
+        window.triggerExport = (format) => {
             const now = new Date();
-            let t = `<table border="1"><thead><tr><th colspan="7">DAFTAR PESERTA KONKERPROV I PGRI BANTEN</th></tr><tr><th colspan="7">Developed by Edi Brata - Diunduh pada: ${now.toLocaleString('id-ID')}</th></tr><tr><th>No</th><th>Kamar</th><th>Nama Peserta</th><th>JK</th><th>Kaos</th><th>Utusan</th><th>WhatsApp</th></tr></thead><tbody>`;
-            [...adminState].sort((a,b)=>a.no-b.no).forEach(p => {
-                t += `<tr><td>${p.no}</td><td>${p.kamar || '--'}</td><td>${p.nama}</td><td>${p.jk==='L'?'Laki-Laki':'Perempuan'}</td><td>${p.ukuran}</td><td>${p.utusan}</td><td>${p.wa || '-'}</td></tr>`;
-            });
-            t += `</tbody></table>`;
-            const fileName = `Data Peserta Konkerprov I PGRI Banten_Pandeglang ${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}.${String(now.getMinutes()).padStart(2,'0')}.${String(now.getSeconds()).padStart(2,'0')}.xls`;
-            const uri = 'data:application/vnd.ms-excel;base64,' + btoa(unescape(encodeURIComponent(t)));
-            const link = document.createElement("a"); link.href = uri; link.download = fileName; link.click();
+            const timestamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}.${String(now.getMinutes()).padStart(2,'0')}.${String(now.getSeconds()).padStart(2,'0')}`;
+            const fileName = `Data Peserta Konkerprov I PGRI Banten_Pandeglang ${timestamp}.${format}`;
+            
+            // Prepare Data Table for Export
+            const sortedExportData = [...adminState].sort((a,b) => a.no - b.no);
+
+            if (format === 'xlsx') {
+                const wsData = [
+                    ["DAFTAR PESERTA KONKERPROV I PGRI BANTEN"],
+                    [`Diunduh pada: ${now.toLocaleString('id-ID')}`],
+                    ["Developed by Edi Brata"],
+                    [], // Blank line
+                    ["No", "Kamar", "Nama Peserta", "L/P", "Kaos", "Asal Utusan", "WhatsApp"]
+                ];
+
+                sortedExportData.forEach(p => {
+                    wsData.push([p.no, p.kamar || '-', p.nama, p.jk, p.ukuran, p.utusan, p.wa || '-']);
+                });
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                
+                // Set Column Widths
+                ws['!cols'] = [
+                    {wch: 5}, {wch: 8}, {wch: 35}, {wch: 5}, {wch: 8}, {wch: 30}, {wch: 20}
+                ];
+
+                XLSX.utils.book_append_sheet(wb, ws, "Data Peserta");
+                XLSX.writeFile(wb, fileName);
+            } else {
+                // Formatting for XLS (Legacy HTML based)
+                let tableHtml = `
+                    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                    <head><meta charset="UTF-8">
+                    <style>
+                        table { border-collapse: collapse; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+                        .title { font-size: 16pt; font-weight: bold; color: #1d4ed8; text-align: center; }
+                        .header { background-color: #1d4ed8; color: #ffffff; font-weight: bold; border: 1px solid #000; text-align: center; }
+                        td { border: 1px solid #ccc; padding: 5px; }
+                        .center { text-align: center; }
+                        .bold { font-weight: bold; }
+                    </style>
+                    </head>
+                    <body>
+                    <table>
+                        <tr><th colspan="7" class="title">DAFTAR PESERTA KONKERPROV I PGRI BANTEN</th></tr>
+                        <tr><th colspan="7" style="text-align:center">Developed by Edi Brata - Diunduh pada: ${now.toLocaleString('id-ID')}</th></tr>
+                        <tr><td colspan="7"></td></tr>
+                        <thead>
+                            <tr>
+                                <th class="header">No</th>
+                                <th class="header">Kamar</th>
+                                <th class="header">Nama Peserta</th>
+                                <th class="header">L/P</th>
+                                <th class="header">Kaos</th>
+                                <th class="header">Utusan</th>
+                                <th class="header">WhatsApp</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                
+                sortedExportData.forEach(p => {
+                    tableHtml += `
+                        <tr>
+                            <td class="center">${p.no}</td>
+                            <td class="center bold" style="color: #1d4ed8">${p.kamar || '-'}</td>
+                            <td>${p.nama}</td>
+                            <td class="center">${p.jk}</td>
+                            <td class="center">${p.ukuran}</td>
+                            <td>${p.utusan}</td>
+                            <td class="center">${p.wa || '-'}</td>
+                        </tr>`;
+                });
+
+                tableHtml += `</tbody></table></body></html>`;
+
+                const uri = 'data:application/vnd.ms-excel;base64,' + btoa(unescape(encodeURIComponent(tableHtml)));
+                const link = document.createElement("a");
+                link.href = uri;
+                link.download = fileName;
+                link.click();
+            }
+            
+            closeExportModal();
+            showToast(`File .${format.toUpperCase()} Berhasil Diunduh`);
         };
 
         window.togglePasswordVisibility = () => {
