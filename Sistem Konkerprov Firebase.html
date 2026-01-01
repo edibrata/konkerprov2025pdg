@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Peserta Konkerprov I PGRI Banten</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Global Font Inter */
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        .tab-active { border-bottom: 3px solid #1d4ed8; color: #1d4ed8; }
+        th.sortable { cursor: pointer; transition: background 0.2s; }
+        th.sortable:hover { background: #f1f5f9; }
+        .modal { transition: opacity 0.2s ease; }
+        body.modal-active { overflow: hidden; }
+        
+        .logo-container { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 12px; overflow: hidden; }
+        .logo-container img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        
+        .participant-photo { width: 75px; height: 75px; object-fit: cover; border-radius: 14px; background: #f1f5f9; border: 2px solid #fff; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .photo-small { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .photo-roommate { width: 34px; height: 34px; object-fit: cover; border-radius: 50%; border: 1px solid #dbeafe; }
+        
+        /* Badge Styles */
+        .badge-base { padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 4px; transition: all 0.2s; white-space: nowrap; }
+        .badge-wa { background-color: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+        .badge-wa:hover { background-color: #dcfce7; transform: translateY(-1px); }
+        
+        /* Proper Case Branding */
+        .edi-brata-tag { color: #fbbf24; font-weight: 700; border-left: 2px solid rgba(255,255,255,0.3); padding-left: 10px; margin-left: 10px; letter-spacing: 0.01em; }
+        .edi-brata-footer { color: #1d4ed8; font-weight: 700; }
+        
+        /* Stats Styling */
+        .stat-card { background: white; padding: 1.25rem; border-radius: 1.5rem; border-bottom: 4px solid; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: all 0.3s ease; display: flex; align-items: center; gap: 1rem; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .stat-icon { width: 48px; height: 48px; border-radius: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .stat-label { font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 2px; }
+        .stat-value { font-size: 1.5rem; font-weight: 900; color: #1e293b; line-height: 1; }
+        .shirt-pill { font-size: 0.85rem; font-weight: 700; padding: 2px 10px; border-radius: 8px; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+        
+        /* Database Table: Locked Sticky Header & Vertical Scroll */
+        .db-table-container { max-height: 60vh; overflow-y: auto; overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: white; position: relative; }
+        .db-table-container thead th { position: sticky; top: 0; background-color: #f8fafc; z-index: 40; box-shadow: inset 0 -2px 0 #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+        
+        .db-table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+        .db-table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        .found-indicator { font-size: 0.7rem; font-weight: 800; color: #1d4ed8; background: #eff6ff; padding: 2px 10px; border-radius: 6px; border: 1px solid #dbeafe; display: inline-flex; align-items: center; gap: 4px; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-900 selection:bg-blue-100">
+
+    <!-- Header Section -->
+    <header class="bg-blue-700 text-white p-6 shadow-lg border-b-4 border-blue-800">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="logo-container shadow-inner">
+                    <img src="https://raw.githubusercontent.com/edibrata/image/main/Logo%20PGRI%20Official.png" alt="Logo PGRI Official">
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black uppercase tracking-wide">Konkerprov I PGRI Banten</h1>
+                    <p class="text-blue-100 text-sm flex items-center flex-wrap font-medium">
+                        Sistem Informasi Peserta - Kab. Pandeglang 
+                        <span class="edi-brata-tag">Developed by Edi Brata</span>
+                    </p>
+                </div>
+            </div>
+            <div id="currentTime" class="text-sm bg-blue-800/50 px-5 py-2 rounded-full border border-blue-400/30 font-mono text-center md:text-left shadow-inner"></div>
+        </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-40 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto flex">
+            <button onclick="switchTab('dashboard')" id="btn-dashboard" class="flex-1 py-4 font-bold text-slate-500 transition-all tab-active text-sm">
+                <i class="fas fa-th-large mr-2"></i>Dashboard Peserta
+            </button>
+            <button onclick="switchTab('admin')" id="btn-admin" class="flex-1 py-4 font-bold text-slate-500 text-sm">
+                <i class="fas fa-database mr-2"></i>Database
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        
+        <!-- Tab 1: Dashboard -->
+        <div id="tab-dashboard" class="space-y-8">
+            <div id="recapSection" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm space-y-4 border border-slate-100">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="min-w-0 flex-1">
+                        <h2 class="text-xl font-black text-slate-800 border-l-4 border-blue-600 pl-3">Cari Kamar & Peserta</h2>
+                        <div id="dashboardFound" class="hidden mt-1">
+                            <span class="found-indicator"><i class="fas fa-search text-[10px]"></i> <span id="foundCount">0</span> Data Ditemukan</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-100">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Urutkan</label>
+                        <select id="dashboardSort" onchange="filterData()" class="text-xs font-bold text-blue-700 bg-transparent outline-none cursor-pointer">
+                            <option value="no">Nomor Urut</option>
+                            <option value="kamar">Nomor Kamar</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
+                        <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Cari nama peserta..." 
+                               class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-sm text-slate-700">
+                    </div>
+                    <div>
+                        <select id="filterUtusan" onchange="filterData()" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none appearance-none bg-white cursor-pointer font-bold text-sm text-slate-700">
+                            <option value="">Semua Utusan</option>
+                            <option value="Kabupaten">Pengurus Kabupaten</option>
+                            <option value="Cabang">Pengurus Cabang</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="filterGender" onchange="filterData()" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none appearance-none bg-white cursor-pointer font-bold text-sm text-slate-700">
+                            <option value="">Semua Jenis Kelamin</option>
+                            <option value="L">Laki-Laki (L)</option>
+                            <option value="P">Perempuan (P)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="participantContainer"></div>
+        </div>
+
+        <!-- Tab 2: Admin Auth -->
+        <div id="tab-admin-auth" class="hidden flex items-center justify-center py-20">
+            <div class="bg-white p-10 rounded-3xl shadow-xl w-full max-w-md border border-slate-100 text-center font-medium">
+                <div class="bg-blue-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 transform rotate-3">
+                    <i class="fas fa-user-lock text-blue-600 text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-black text-slate-800 mb-2 uppercase tracking-tighter">Login Database</h2>
+                <div class="space-y-4 text-left">
+                    <div class="relative">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Password</label>
+                        <input type="password" id="adminPassword" onkeyup="if(event.key==='Enter') loginAdmin()" placeholder="••••••••" class="w-full px-4 py-3 mt-1 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none pr-12 font-bold tracking-widest text-center">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-4 top-9 text-gray-400 hover:text-blue-600">
+                            <i id="passwordIcon" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <button onclick="loginAdmin()" class="w-full bg-blue-700 text-white py-4 rounded-xl font-black hover:bg-blue-800 transition-all shadow-lg uppercase tracking-widest text-xs">Masuk</button>
+                    <p id="loginError" class="text-red-500 text-xs text-center hidden font-bold mt-2">Password salah!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Database Content -->
+        <div id="tab-admin-content" class="hidden space-y-6">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col lg:flex-row items-center gap-4">
+                <div class="flex flex-col gap-0.5 min-w-[220px]">
+                    <h2 class="text-lg font-black text-gray-800 leading-none">Data Peserta</h2>
+                    <p class="text-[9px] text-blue-600 font-bold tracking-[0.05em]">Developed by Edi Brata</p>
+                </div>
+
+                <div class="relative flex-1 w-full">
+                    <i class="fas fa-search absolute left-4 top-3 text-slate-400 text-xs"></i>
+                    <input type="text" id="adminSearchInput" onkeyup="filterAdminData()" placeholder="Cari di database..." 
+                           class="w-full pl-10 pr-24 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-xs font-bold">
+                    <div class="absolute right-2 top-1.5">
+                        <span id="adminFoundBadge" class="found-indicator hidden"><span id="adminFoundCount">0</span> ditemukan</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 w-full lg:w-auto flex-wrap justify-center font-bold">
+                    <button onclick="openFormModal()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-blue-700 text-[10px] shadow-sm transition-all whitespace-nowrap uppercase tracking-wider"><i class="fas fa-plus mr-1"></i>Tambah</button>
+                    <button onclick="exportToExcel()" class="bg-green-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-green-700 text-[10px] shadow-sm transition-all whitespace-nowrap uppercase tracking-wider"><i class="fas fa-file-excel mr-1"></i>Ekspor</button>
+                    <button onclick="logoutAdmin()" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl font-bold hover:bg-red-100 text-[10px] transition-all whitespace-nowrap uppercase tracking-wider"><i class="fas fa-power-off mr-1"></i>Logout</button>
+                </div>
+            </div>
+            
+            <div class="db-table-container">
+                <table class="w-full text-left border-collapse" id="adminTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortAdmin('no')" class="sortable px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">No</th>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Foto</th>
+                            <th onclick="sortAdmin('kamar')" class="sortable px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Kamar</th>
+                            <th onclick="sortAdmin('nama')" class="sortable px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Nama Peserta</th>
+                            <th onclick="sortAdmin('jk')" class="sortable px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Jenis Kelamin</th>
+                            <th class="px-4 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Ukuran Kaos</th>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase text-center">WhatsApp</th>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody" class="divide-y divide-slate-50 text-sm font-medium text-slate-700"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 text-center pb-12 text-slate-400 text-xs border-t border-slate-200 pt-10 px-4">
+        <p class="mb-2 uppercase tracking-[0.3em] font-black text-gray-300">Sistem Informasi Peserta Konkerprov I PGRI Banten</p>
+        <p>&copy; 2026 PGRI Kabupaten Pandeglang. All rights reserved.</p>
+        <p class="mt-6 text-slate-500 font-bold tracking-widest uppercase text-shadow">
+            Developed by <span class="edi-brata-footer uppercase">Edi Brata</span>
+        </p>
+    </footer>
+
+    <!-- Form Modal -->
+    <div id="formModal" class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center opacity-0 pointer-events-none z-[100] font-medium">
+        <div class="modal-overlay absolute w-full h-full bg-slate-900/60 backdrop-blur-sm" onclick="closeFormModal()"></div>
+        <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded-[2rem] shadow-2xl z-50 overflow-y-auto">
+            <div class="modal-content py-6 text-left px-8 text-gray-800">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 shadow-sm">
+                        <i class="fas fa-user-edit text-lg"></i>
+                    </div>
+                    <h2 class="text-xl font-black tracking-tighter" id="modalTitle">Update Peserta</h2>
+                </div>
+                
+                <form id="participantForm" class="space-y-4 text-gray-700">
+                    <input type="hidden" id="editNo">
+                    
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Nama Lengkap</label>
+                        <input type="text" id="formNama" placeholder="Nama..." required 
+                               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-800 transition-all">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Asal Utusan</label>
+                        <input type="text" id="formUtusan" placeholder="Utusan..." required 
+                               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 transition-all">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Tautan Foto GitHub (Opsional)</label>
+                        <input type="url" id="formFotoUrl" placeholder="https://github.com/..." class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-medium text-xs text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Jenis Kelamin</label>
+                            <select id="formJK" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 outline-none appearance-none cursor-pointer">
+                                <option value="L">Laki-Laki (L)</option>
+                                <option value="P">Perempuan (P)</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Ukuran Kaos</label>
+                            <select id="formUkuran" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 outline-none appearance-none cursor-pointer">
+                                <option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="2L">2L</option><option value="3L">3L</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Nomor Kamar</label>
+                            <input type="text" id="formKamar" placeholder="01" 
+                                   class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-800 text-center transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">WhatsApp</label>
+                            <input type="text" id="formWA" placeholder="08..." 
+                                   class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-800 transition-all">
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex justify-end gap-3 font-bold">
+                        <button type="button" onclick="closeFormModal()" 
+                                class="px-6 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-all text-sm">Batal</button>
+                        <button type="submit" 
+                                class="px-8 py-2.5 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 text-xs uppercase tracking-wider">
+                            Simpan Data
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-10 right-10 bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-24 opacity-0 transition-all z-[200] flex items-center gap-3 font-bold">
+        <i class="fas fa-check-circle text-green-400"></i><span id="toastMsg">Berhasil!</span>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        // FIREBASE INITIALIZATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyBktFbXzld7ehIfV2YThx-VSkpaTYcFXNc",
+            authDomain: "apks-pgri.firebaseapp.com",
+            projectId: "apks-pgri",
+            storageBucket: "apks-pgri.firebasestorage.app",
+            messagingSenderId: "417055690782",
+            appId: "1:417055690782:web:55232a4faca5307780de0f",
+            measurementId: "G-C139DQS0JN"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'apks-pgri-konker';
+        const colPath = `artifacts/${appId}/public/data/peserta`;
+        
+        // --- HELPER CONSTANTS & FUNCTIONS (Defined early to prevent ReferenceError) ---
+        const PHOTO_BASE_URL = "https://raw.githubusercontent.com/edibrata/image/main/Foto%20Konkerprov/";
+
+        const getWALink = (phone) => {
+            if (!phone) return "#";
+            let c = phone.toString().replace(/\D/g, '');
+            if (c.startsWith('0')) c = '62' + c.substring(1);
+            return `https://wa.me/${c}`;
+        };
+
+        const escapeJS = (str) => str ? str.replace(/'/g, "\\'") : "";
+        
+        const convertToRawGitHub = (url) => {
+            if (!url) return "";
+            if (url.includes("github.com") && url.includes("/blob/")) {
+                return url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/");
+            }
+            return url;
+        };
+
+        const getPhotoSource = (p) => {
+            if (p.fotoUrl) return convertToRawGitHub(p.fotoUrl);
+            return `${PHOTO_BASE_URL}${encodeURIComponent(p.nama).replace(/'/g, "%27")}.jpeg`;
+        };
+
+        const attachImageListeners = () => {
+            document.querySelectorAll('img[data-name]').forEach(img => {
+                img.onerror = () => {
+                    const name = img.getAttribute('data-name');
+                    const extensions = [".jpeg", ".jpg", ".png"];
+                    let src = img.src.toLowerCase();
+                    let currentExt = extensions.find(ext => src.endsWith(ext)) || ".jpeg";
+                    let idx = extensions.indexOf(currentExt);
+                    
+                    if (idx < extensions.length - 1) {
+                        img.src = `${PHOTO_BASE_URL}${encodeURIComponent(name).replace(/'/g, "%27")}${extensions[idx+1]}`;
+                    } else {
+                        img.onerror = null;
+                        img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=128`;
+                    }
+                };
+            });
+        };
+
+        const showToast = (msg) => {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            t.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => t.classList.add('translate-y-24', 'opacity-0'), 3000);
+        };
+
+        // --- DATA STATE ---
+        let rawData = [];
+        let state = [];
+        let adminState = [];
+        let user = null;
+        let currentSortAdmin = { column: 'no', direction: 'asc' };
+
+        const initialData = [
+            { no: 1, utusan: "Pengurus Kabupaten", nama: "H. Sutoto", jk: "L", ukuran: "XL", wa: "081910984445", kamar: "01" },
+            { no: 2, utusan: "Pengurus Kabupaten", nama: "M. Topan Subhi", jk: "L", ukuran: "XL", wa: "085920071200", kamar: "01" },
+            { no: 3, utusan: "Pengurus Kabupaten", nama: "H. Rianto Danardono", jk: "L", ukuran: "L", wa: "081399007166", kamar: "02" },
+            { no: 4, utusan: "Pengurus Kabupaten", nama: "Ikhwan Zainudin", jk: "L", ukuran: "L", wa: "081387565928", kamar: "02" },
+            { no: 5, utusan: "Pengurus Kabupaten", nama: "Hj. Ipah Latipah", jk: "P", ukuran: "2L", wa: "081511870124", kamar: "04" },
+            { no: 6, utusan: "Pengurus Kabupaten", nama: "Edi Brata", jk: "L", ukuran: "XL", wa: "087773949015", kamar: "03" },
+            { no: 7, utusan: "Pengurus Perwakilan YPLP", nama: "Ruli Purnama YPLP", jk: "L", ukuran: "XL", wa: "081808927614", kamar: "03" },
+            { no: 8, utusan: "Pengurus Cabang Angsana", nama: "Rosad Angsana", jk: "L", ukuran: "L", wa: "083103360596", kamar: "06" },
+            { no: 9, utusan: "Pengurus Cabang Banjar", nama: "Dede Hermansyah Banjar", jk: "L", ukuran: "L", wa: "087773646747", kamar: "06" },
+            { no: 10, utusan: "Pengurus Cabang Bojong", nama: "Neneng Ratnasari Bojong", jk: "P", ukuran: "XL", wa: "085311525559", kamar: "04" },
+            { no: 11, utusan: "Pengurus Cabang Cadasari", nama: "Dedi Efendi Cadasari", jk: "L", ukuran: "XL", wa: "087773135313", kamar: "07" },
+            { no: 12, utusan: "Pengurus Cabang Carita", nama: "Ahmad Fahroji Carita", jk: "L", ukuran: "L", wa: "087755534467", kamar: "07" },
+            { no: 13, utusan: "Pengurus Cabang Cibaliung", nama: "Budiyono Cibaliung", jk: "L", ukuran: "XL", wa: "085218336788", kamar: "08" },
+            { no: 14, utusan: "Pengurus Cabang Cibitung", nama: "H. Aik Moh Tasrik Cibitung", jk: "L", ukuran: "L", wa: "085693523882", kamar: "08" },
+            { no: 15, utusan: "Pengurus Cabang Cigeulis", nama: "Muhamad Furkon Cigeulis", jk: "L", ukuran: "XL", wa: "083822071608", kamar: "09" },
+            { no: 16, utusan: "Pengurus Cabang Cikedal", nama: "Aa Hidayat Cikedal", jk: "L", ukuran: "2L", wa: "087866262924", kamar: "09" },
+            { no: 17, utusan: "Pengurus Cabang Cikeusik", nama: "Uci Sauci Cikeusik", jk: "L", ukuran: "2L", wa: "085886919799", kamar: "10" },
+            { no: 18, utusan: "Pengurus Cabang Cimanggu", nama: "Tohirin Cimanggu", jk: "L", ukuran: "L", wa: "085720814429", kamar: "10" },
+            { no: 19, utusan: "Pengurus Cabang Cimanuk", nama: "Didi Supardi Cimanuk", jk: "L", ukuran: "M", wa: "085215587434", kamar: "11" },
+            { no: 20, utusan: "Pengurus Cabang Cipeucang", nama: "Odang Sumarno Cipeucang", jk: "L", ukuran: "2L", wa: "08568456052", kamar: "11" },
+            { no: 21, utusan: "Pengurus Cabang Cisata", nama: "Ade Safrudin Cisata", jk: "L", ukuran: "L", wa: "081314464192", kamar: "12" },
+            { no: 22, utusan: "Pengurus Cabang Jiput", nama: "Moch. Yusuf Jiput", jk: "L", ukuran: "L", wa: "081280289286", kamar: "12" },
+            { no: 23, utusan: "Pengurus Cabang Kaduhejo", nama: "Jaja Sunarja Kaduhejo", jk: "L", ukuran: "L", wa: "081806031359", kamar: "13" },
+            { no: 24, utusan: "Pengurus Cabang Kaduhejo", nama: "Suhernawati Kaduhejo", jk: "P", ukuran: "XL", wa: "085774532934", kamar: "05" },
+            { no: 25, utusan: "Pengurus Cabang Kaduhejo", nama: "Hasbi Asydiqi Kaduhejo", jk: "L", ukuran: "M", wa: "089666133956", kamar: "13" },
+            { no: 26, utusan: "Pengurus Cabang Karang Tanjung", nama: "Mohamad Jajuli Karang Tanjung", jk: "L", ukuran: "L", wa: "085770987728", kamar: "14" },
+            { no: 27, utusan: "Pengurus Cabang Koroncong", nama: "Hj. Bai Badariah Koroncong", jk: "P", ukuran: "2L", wa: "081316372837", kamar: "05" },
+            { no: 28, utusan: "Pengurus Cabang Labuan", nama: "Jupri Labuan", jk: "L", ukuran: "L", wa: "083841205992", kamar: "14" },
+            { no: 29, utusan: "Pengurus Cabang Majasari", nama: "Rupyadi Majasari", jk: "L", ukuran: "XL", wa: "085772847941", kamar: "15" },
+            { no: 30, utusan: "Pengurus Cabang Mandalawangi", nama: "Mahpudin Mandalawangi", jk: "L", ukuran: "L", wa: "081284423706", kamar: "15" },
+            { no: 31, utusan: "Pengurus Cabang Mekarjaya", nama: "Ecep Ahmad Rifa'i Mekarjaya", jk: "L", ukuran: "L", wa: "085692444441", kamar: "16" },
+            { no: 32, utusan: "Pengurus Cabang Menes", nama: "Yayah Sunariah Menes", jk: "P", ukuran: "2L", wa: "085211773625", kamar: "22" },
+            { no: 33, utusan: "Pengurus Cabang Munjul", nama: "Sasa Suja'i Munjul", jk: "L", ukuran: "L", wa: "081295387876", kamar: "16" },
+            { no: 34, utusan: "Pengurus Cabang Pagelaran", nama: "Nana Suhana Pagelaran", jk: "L", ukuran: "L", wa: "083807390903", kamar: "17" },
+            { no: 35, utusan: "Pengurus Cabang Pandeglang", nama: "H. Suherman Pandeglang", jk: "L", ukuran: "L", wa: "085288535522", kamar: "17" },
+            { no: 36, utusan: "Pengurus Cabang Panimbang", nama: "Yaya Rukbi Panimbang", jk: "L", ukuran: "M", wa: "081910867055", kamar: "18" },
+            { no: 37, utusan: "Pengurus Cabang Patia", nama: "Taufik Ahmad Patia", jk: "L", ukuran: "L", wa: "081210288753", kamar: "18" },
+            { no: 38, utusan: "Pengurus Cabang Picung", nama: "Didi Setiadi Picung", jk: "L", ukuran: "L", wa: "081310553057", kamar: "19" },
+            { no: 39, utusan: "Pengurus Cabang Pulosari", nama: "Jupri Pulosari", jk: "L", ukuran: "L", wa: "087809646667", kamar: "19" },
+            { no: 40, utusan: "Pengurus Cabang Saketi", nama: "Muhammad Ali Saketi", jk: "L", ukuran: "L", wa: "085959417818", kamar: "20" },
+            { no: 41, utusan: "Pengurus Cabang Sindangresmi", nama: "Hidayatullah Sindangresmi", jk: "L", ukuran: "M", wa: "085691103688", kamar: "20" },
+            { no: 42, utusan: "Pengurus Cabang Sobang", nama: "Jumino Sobang", jk: "L", ukuran: "XL", wa: "085819302746", kamar: "21" },
+            { no: 43, utusan: "Pengurus Cabang Sukaresmi", nama: "Saefullah Sukaresmi", jk: "L", ukuran: "L", wa: "083813109255", kamar: "21" },
+            { no: 44, utusan: "Pengurus Cabang Sumur", nama: "Asep Sumarna Sumur", jk: "L", ukuran: "M", wa: "085718748164", kamar: "22" }
+        ];
+
+        // --- RENDER FUNCTIONS ---
+        const renderRecap = () => {
+            const counts = { total: rawData.length, L: 0, P: 0, Kabupaten: 0, Cabang: 0, M: 0, L_shirt: 0, XL: 0, '2L': 0, '3L': 0 };
+            rawData.forEach(p => {
+                if (p.jk === 'L') counts.L++; else counts.P++;
+                const ut = (p.utusan || "").toLowerCase();
+                if (ut.includes("kabupaten") || ut.includes("yplp")) counts.Kabupaten++; else counts.Cabang++;
+                const sz = (p.ukuran || "").toUpperCase();
+                if (sz === 'M') counts.M++; else if (sz === 'L') counts.L_shirt++; else if (sz === 'XL') counts.XL++; else if (sz === '2L') counts['2L']++;
+            });
+            const shirtStats = [{label:'M',v:counts.M},{label:'L',v:counts.L_shirt},{label:'XL',v:counts.XL},{label:'2L',v:counts['2L']}].filter(s=>s.v>0);
+            
+            document.getElementById('recapSection').innerHTML = `
+                <div class="stat-card border-blue-600"><div class="stat-icon bg-blue-100 text-blue-600"><i class="fas fa-users text-xl"></i></div><div><p class="stat-label">Jumlah Peserta</p><p class="stat-value text-blue-600">${counts.total}</p></div></div>
+                <div class="stat-card border-indigo-600"><div class="stat-icon bg-indigo-100 text-indigo-600"><i class="fas fa-venus-mars text-xl"></i></div><div><p class="stat-label">Jenis Kelamin</p><div class="flex gap-4"><p class="stat-value text-indigo-600">${counts.L}<span class="text-[9px] text-slate-400 font-bold ml-1 uppercase">Laki-Laki</span></p><p class="stat-value text-pink-500">${counts.P}<span class="text-[9px] text-slate-400 font-bold ml-1 uppercase">Perempuan</span></p></div></div></div>
+                <div class="stat-card border-amber-500"><div class="stat-icon bg-amber-100 text-amber-600"><i class="fas fa-sitemap text-xl"></i></div><div><p class="stat-label">Kelompok Utusan</p><div class="flex gap-4"><p class="stat-value text-amber-600">${counts.Kabupaten}<span class="text-[8px] font-bold uppercase">Kab</span></p><p class="stat-value text-amber-600">${counts.Cabang}<span class="text-[8px] font-bold uppercase">Cab</span></p></div></div></div>
+                <div class="stat-card border-green-600"><div class="stat-icon bg-green-100 text-green-600"><i class="fas fa-tshirt text-xl"></i></div><div class="min-w-0 flex-1"><p class="stat-label">Ukuran Kaos</p><div class="flex flex-wrap gap-1 mt-1">${shirtStats.map(s => `<span class="shirt-pill">${s.label}:<span class="text-green-600 ml-0.5 font-black">${s.v}</span></span>`).join('')}</div></div></div>`;
+        };
+
+        const renderDashboard = () => {
+            const sortBy = document.getElementById('dashboardSort').value;
+            let sorted = [...state].sort((a, b) => sortBy === 'kamar' ? (a.kamar || "99").localeCompare(b.kamar || "99", undefined, {numeric: true}) : a.no - b.no);
+            
+            const foundEl = document.getElementById('dashboardFound');
+            if (document.getElementById('searchInput').value || document.getElementById('filterUtusan').value || document.getElementById('filterGender').value) {
+                foundEl.classList.remove('hidden'); document.getElementById('foundCount').innerText = state.length;
+            } else foundEl.classList.add('hidden');
+
+            let html = '';
+            sorted.forEach(p => {
+                const roommates = rawData.filter(r => r.kamar === p.kamar && r.firebaseId !== p.firebaseId);
+                let rmHtml = roommates.length > 0 ? roommates.map(r => `
+                    <div class="flex items-center justify-between mt-2 p-2 rounded-xl bg-blue-50/50 border border-blue-100/30">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            <img src="${getPhotoSource(r)}" class="photo-roommate" data-name="${r.nama}" onerror="handleImageError(this, '${escapeJS(r.nama)}')">
+                            <div class="min-w-0"><p class="text-[10px] font-bold text-blue-900 truncate">${r.nama}</p><p class="text-[8px] text-slate-400 font-bold uppercase truncate">${r.utusan}</p></div>
+                        </div>
+                        <a href="${getWALink(r.wa)}" target="_blank" class="wa-small flex-shrink-0 ml-2 hover:scale-110 transition-transform"><i class="fab fa-whatsapp text-lg"></i></a>
+                    </div>`).join("") : '<p class="text-[10px] italic text-gray-300 mt-1 pl-1 font-medium">Sendiri</p>';
+
+                html += `
+                    <div class="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col h-full relative overflow-hidden">
+                        <div class="flex gap-4 mb-4">
+                            <img src="${getPhotoSource(p)}" class="participant-photo" data-name="${p.nama}" onerror="handleImageError(this, '${escapeJS(p.nama)}')">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start"><span class="bg-blue-600 text-white px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase">Kamar ${p.kamar || '--'}</span><span class="text-[9px] text-gray-300 font-bold font-mono">#${p.no}</span></div>
+                                <h3 class="font-black text-slate-800 text-sm mt-2 truncate">${p.nama}</h3>
+                                <p class="text-[10px] text-slate-500 mt-1 truncate font-bold uppercase"><i class="fas fa-building mr-1 text-blue-400"></i>${p.utusan}</p>
+                                <div class="flex flex-wrap gap-1.5 mt-3 items-center">
+                                    <span class="text-[9px] bg-slate-100 px-2.5 py-0.5 rounded-full font-bold">Kaos: ${p.ukuran}</span>
+                                    <span class="text-[9px] ${p.jk==='L'?'bg-blue-50 text-blue-700':'bg-pink-50 text-pink-700'} px-2.5 py-0.5 rounded-full font-bold">${p.jk==='L'?'Laki-Laki':'Perempuan'}</span>
+                                    <a href="${getWALink(p.wa)}" target="_blank" class="badge-base badge-wa"><i class="fab fa-whatsapp"></i> Hubungi</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-auto pt-4 border-t border-slate-50"><p class="text-[9px] font-bold text-slate-400 flex items-center gap-1.5 mb-2 tracking-wide"><i class="fas fa-users text-[10px]"></i> Teman Sekamar</p>${rmHtml}</div>
+                    </div>`;
+            });
+            document.getElementById('participantContainer').innerHTML = html;
+            attachImageListeners();
+        };
+
+        const renderAdminTable = () => {
+            const tbody = document.getElementById('adminTableBody');
+            let sortedData = [...adminState].sort((a,b) => {
+                let vA = a[currentSortAdmin.column], vB = b[currentSortAdmin.column];
+                return typeof vA === 'string' ? (currentSortAdmin.direction==='asc'?vA.localeCompare(vB,undefined,{numeric:true}):vB.localeCompare(vA,undefined,{numeric:true})) : (currentSortAdmin.direction==='asc'?vA-vB:vB-vA);
+            });
+            tbody.innerHTML = sortedData.map(p => `
+                <tr class="hover:bg-blue-50/50 transition-colors border-b font-medium text-slate-700">
+                    <td class="px-6 py-4 text-xs font-mono font-bold">${p.no}</td>
+                    <td class="px-6 py-4"><img src="${getPhotoSource(p)}" class="photo-small shadow-sm" data-name="${p.nama}" onerror="handleImageError(this, '${escapeJS(p.nama)}')"></td>
+                    <td class="px-6 py-4 font-black text-blue-700 text-center">${p.kamar || '--'}</td>
+                    <td class="px-6 py-4"><p class="font-black text-slate-800">${p.nama}</p><p class="text-[10px] font-bold uppercase opacity-50">${p.utusan}</p></td>
+                    <td class="px-6 py-4 text-center">${p.jk==='L'?'Laki-Laki':'Perempuan'}</td>
+                    <td class="px-4 py-4 text-center font-black">${p.ukuran}</td>
+                    <td class="px-6 py-4 text-center"><a href="${getWALink(p.wa)}" target="_blank" class="text-green-600 hover:text-green-700 flex items-center justify-center gap-2 font-mono text-xs font-bold bg-green-50 py-1.5 rounded-xl border border-green-100"><i class="fab fa-whatsapp"></i> ${p.wa || '-'}</a></td>
+                    <td class="px-6 py-4 text-center"><div class="flex justify-center gap-2"><button onclick="openFormModal(${p.no})" class="bg-amber-100 text-amber-600 p-2.5 rounded-xl hover:bg-amber-200 shadow-sm"><i class="fas fa-edit"></i></button><button onclick="confirmDelete('${escapeJS(p.firebaseId)}')" class="bg-red-50 text-red-400 p-2.5 rounded-xl hover:text-red-600 hover:bg-red-100 shadow-sm"><i class="fas fa-trash-alt"></i></button></div></td>
+                </tr>`).join('');
+            attachImageListeners();
+        };
+
+        // --- CORE MODULE ACTIONS ---
+        window.switchTab = (tab) => {
+            const isDash = tab === 'dashboard';
+            const isAdmin = tab === 'admin';
+            
+            document.getElementById('tab-dashboard').classList.toggle('hidden', !isDash);
+            
+            const isLogged = !document.getElementById('tab-admin-content').classList.contains('hidden');
+            if (isAdmin) {
+                if (isLogged) {
+                    document.getElementById('tab-admin-auth').classList.add('hidden');
+                    document.getElementById('tab-admin-content').classList.remove('hidden');
+                } else {
+                    document.getElementById('tab-admin-auth').classList.remove('hidden');
+                    document.getElementById('tab-admin-content').classList.add('hidden');
+                }
+            } else {
+                document.getElementById('tab-admin-auth').classList.add('hidden');
+                document.getElementById('tab-admin-content').classList.add('hidden');
+            }
+            
+            document.getElementById('btn-dashboard').classList.toggle('tab-active', isDash);
+            document.getElementById('btn-admin').classList.toggle('tab-active', isAdmin);
+        };
+
+        window.loginAdmin = () => {
+            if (document.getElementById('adminPassword').value === "EdiBrata#1") {
+                document.getElementById('tab-admin-auth').classList.add('hidden');
+                document.getElementById('tab-admin-content').classList.remove('hidden');
+                renderAdminTable();
+            } else {
+                const err = document.getElementById('loginError');
+                err.classList.remove('hidden');
+                setTimeout(() => err.classList.add('hidden'), 3000);
+            }
+        };
+
+        window.logoutAdmin = () => {
+            document.getElementById('tab-admin-content').classList.add('hidden');
+            document.getElementById('tab-admin-auth').classList.remove('hidden');
+            document.getElementById('adminPassword').value = '';
+            switchTab('admin');
+        };
+
+        window.filterData = () => {
+            const s = document.getElementById('searchInput').value.toLowerCase();
+            const u = document.getElementById('filterUtusan').value;
+            const g = document.getElementById('filterGender').value;
+            state = rawData.filter(p => (p.nama.toLowerCase().includes(s) || p.utusan.toLowerCase().includes(s)) && (u === "" || p.utusan.includes(u)) && (g === "" || p.jk === g));
+            renderDashboard();
+        };
+
+        window.filterAdminData = () => {
+            const s = document.getElementById('adminSearchInput').value.toLowerCase();
+            adminState = rawData.filter(p => (p.nama.toLowerCase().includes(s) || p.utusan.toLowerCase().includes(s)));
+            const badge = document.getElementById('adminFoundBadge');
+            if (s) {
+                badge.classList.remove('hidden');
+                document.getElementById('adminFoundCount').innerText = adminState.length;
+            } else badge.classList.add('hidden');
+            renderAdminTable();
+        };
+
+        window.sortAdmin = (col) => {
+            currentSortAdmin.direction = (currentSortAdmin.column === col && currentSortAdmin.direction === 'asc') ? 'desc' : 'asc';
+            currentSortAdmin.column = col;
+            renderAdminTable();
+        };
+
+        window.openFormModal = (no = null) => {
+            document.getElementById('participantForm').reset();
+            document.getElementById('editNo').value = "";
+            if (no) {
+                const d = rawData.find(p => p.no == no);
+                document.getElementById('modalTitle').innerText = "Update Peserta";
+                document.getElementById('editNo').value = d.no;
+                document.getElementById('formNama').value = d.nama;
+                document.getElementById('formUtusan').value = d.utusan;
+                document.getElementById('formJK').value = d.jk;
+                document.getElementById('formUkuran').value = d.ukuran;
+                document.getElementById('formKamar').value = d.kamar || "";
+                document.getElementById('formWA').value = d.wa || "";
+                document.getElementById('formFotoUrl').value = d.fotoUrl || "";
+            } else {
+                document.getElementById('modalTitle').innerText = "Daftar Peserta Baru";
+            }
+            document.getElementById('formModal').classList.remove('opacity-0', 'pointer-events-none');
+            document.body.classList.add('modal-active');
+        };
+
+        window.closeFormModal = () => {
+            document.getElementById('formModal').classList.add('opacity-0', 'pointer-events-none');
+            document.body.classList.remove('modal-active');
+        };
+
+        window.saveParticipant = async () => {
+            if (!user) return;
+            const en = document.getElementById('editNo').value;
+            const data = {
+                no: en ? parseInt(en) : (rawData.length > 0 ? Math.max(...rawData.map(p => p.no)) + 1 : 1),
+                nama: document.getElementById('formNama').value,
+                utusan: document.getElementById('formUtusan').value,
+                jk: document.getElementById('formJK').value,
+                ukuran: document.getElementById('formUkuran').value,
+                kamar: document.getElementById('formKamar').value,
+                wa: document.getElementById('formWA').value,
+                fotoUrl: document.getElementById('formFotoUrl').value || ""
+            };
+
+            try {
+                await setDoc(doc(db, ...colPath.split('/'), data.no.toString()), data);
+                closeFormModal();
+                showToast(en ? "Data Berhasil Diperbarui!" : "Peserta Berhasil Terdaftar!");
+            } catch (err) {
+                console.error("Save Error:", err);
+            }
+        };
+
+        window.confirmDelete = async (fId) => {
+            if (confirm("Hapus data peserta dari database?")) {
+                try {
+                    await deleteDoc(doc(db, ...colPath.split('/'), fId));
+                    showToast("Data Dihapus");
+                } catch (err) {
+                    console.error("Delete Error:", err);
+                }
+            }
+        };
+
+        window.exportToExcel = () => {
+            const now = new Date();
+            let t = `<table border="1"><thead><tr><th colspan="7">DAFTAR PESERTA KONKERPROV I PGRI BANTEN</th></tr><tr><th colspan="7">Developed by Edi Brata - Diunduh pada: ${now.toLocaleString('id-ID')}</th></tr><tr><th>No</th><th>Kamar</th><th>Nama Peserta</th><th>JK</th><th>Kaos</th><th>Utusan</th><th>WhatsApp</th></tr></thead><tbody>`;
+            [...adminState].sort((a,b)=>a.no-b.no).forEach(p => {
+                t += `<tr><td>${p.no}</td><td>${p.kamar || '--'}</td><td>${p.nama}</td><td>${p.jk==='L'?'Laki-Laki':'Perempuan'}</td><td>${p.ukuran}</td><td>${p.utusan}</td><td>${p.wa || '-'}</td></tr>`;
+            });
+            t += `</tbody></table>`;
+            const fileName = `Data Peserta Konkerprov I PGRI Banten_Pandeglang ${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}.${String(now.getMinutes()).padStart(2,'0')}.${String(now.getSeconds()).padStart(2,'0')}.xls`;
+            const uri = 'data:application/vnd.ms-excel;base64,' + btoa(unescape(encodeURIComponent(t)));
+            const link = document.createElement("a"); link.href = uri; link.download = fileName; link.click();
+        };
+
+        window.togglePasswordVisibility = () => {
+            const pwd = document.getElementById('adminPassword');
+            const icon = document.getElementById('passwordIcon');
+            pwd.type = pwd.type === 'password' ? 'text' : 'password';
+            icon.classList.toggle('fa-eye'); icon.classList.toggle('fa-eye-slash');
+        };
+
+        // --- FIREBASE SYNC & INITIALIZATION ---
+        const initAuth = async () => {
+            try { await signInAnonymously(auth); } catch (err) { console.error("Auth Failure:", err); }
+        };
+        initAuth();
+
+        const syncInitialDataIfEmpty = async (colRef) => {
+            const snapshot = await getDocs(colRef);
+            if (snapshot.empty) {
+                console.log("Firestore kosong. Mengunggah 44 data...");
+                for (const item of initialData) {
+                    await setDoc(doc(db, ...colPath.split('/'), item.no.toString()), item);
+                }
+            }
+        };
+
+        onAuthStateChanged(auth, async (u) => {
+            user = u;
+            if (u) {
+                const colRef = collection(db, ...colPath.split('/'));
+                await syncInitialDataIfEmpty(colRef);
+                onSnapshot(colRef, (snapshot) => {
+                    rawData = snapshot.docs.map(doc => ({ ...doc.data(), firebaseId: doc.id }));
+                    rawData.sort((a,b) => a.no - b.no);
+                    state = [...rawData];
+                    adminState = [...rawData];
+                    renderRecap(); renderDashboard(); renderAdminTable();
+                }, (err) => console.error("Firestore Error:", err));
+            }
+        });
+
+        // Setup Form Submit
+        document.getElementById('participantForm').onsubmit = (e) => {
+            e.preventDefault();
+            window.saveParticipant();
+        };
+
+        setInterval(() => { 
+            const now = new Date();
+            document.getElementById('currentTime').innerText = now.toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' }); 
+        }, 1000);
+
+    </script>
+</body>
+</html>
