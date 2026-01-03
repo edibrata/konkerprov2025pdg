@@ -24,61 +24,14 @@
         .logo-container { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 12px; overflow: hidden; }
         .logo-container img { max-width: 90%; max-height: 90%; object-fit: contain; }
         
-        .participant-photo { width: 75px; height: 75px; object-fit: cover; border-radius: 14px; background: #f1f5f9; border: 2px solid #fff; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); cursor: pointer; transition: transform 0.2s; }
-        .participant-photo:hover { transform: scale(1.05); }
-        
-        .photo-small { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; transition: transform 0.2s; }
-        .photo-small:hover { transform: scale(1.1); }
-        
-        .photo-roommate { width: 34px; height: 34px; object-fit: cover; border-radius: 50%; border: 1px solid #dbeafe; cursor: pointer; transition: transform 0.2s; }
-        .photo-roommate:hover { transform: scale(1.15); box-shadow: 0 0 0 2px #3b82f6; }
-        
-        /* Photo Preview Styling */
-        .photo-preview-img { max-width: 90vw; max-height: 70vh; object-fit: contain; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-        
-        /* Tooltip Styling - FIXED for Visibility */
-        [data-tooltip] { position: relative; }
-        [data-tooltip]:before {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%) translateY(10px);
-            padding: 6px 12px;
-            background: #1e293b;
-            color: white;
-            font-size: 10px;
-            font-weight: 600;
-            border-radius: 8px;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
-            z-index: 9999; 
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-        }
-        [data-tooltip]:hover:before {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* Card Hover Effect - Removed overflow-hidden to allow tooltips */
-        .participant-card { 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            overflow: visible !important; 
-        }
-        .participant-card:hover { 
-            transform: translateY(-8px); 
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); 
-            border-color: #dbeafe; 
-        }
+        .participant-photo { width: 75px; height: 75px; object-fit: cover; border-radius: 14px; background: #f1f5f9; border: 2px solid #fff; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .photo-small { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .photo-roommate { width: 34px; height: 34px; object-fit: cover; border-radius: 50%; border: 1px solid #dbeafe; }
         
         /* Badge Styles */
         .badge-base { padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 4px; transition: all 0.2s; white-space: nowrap; }
         .badge-wa { background-color: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
-        .badge-wa:hover { background-color: #dcfce7; transform: translateY(-2px); }
+        .badge-wa:hover { background-color: #dcfce7; transform: translateY(-1px); }
         
         /* Proper Case Branding */
         .edi-brata-tag { color: #fbbf24; font-weight: 700; border-left: 2px solid rgba(255,255,255,0.3); padding-left: 10px; margin-left: 10px; letter-spacing: 0.01em; }
@@ -92,9 +45,12 @@
         .stat-value { font-size: 1.5rem; font-weight: 900; color: #1e293b; line-height: 1; }
         .shirt-pill { font-size: 0.85rem; font-weight: 700; padding: 2px 10px; border-radius: 8px; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
         
-        /* Database Table */
+        /* Database Table: Locked Sticky Header & Vertical Scroll */
         .db-table-container { max-height: 60vh; overflow-y: auto; overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: white; position: relative; }
         .db-table-container thead th { position: sticky; top: 0; background-color: #f8fafc; z-index: 40; box-shadow: inset 0 -2px 0 #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+        
+        .db-table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+        .db-table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
         .found-indicator { font-size: 0.7rem; font-weight: 800; color: #1d4ed8; background: #eff6ff; padding: 2px 10px; border-radius: 6px; border: 1px solid #dbeafe; display: inline-flex; align-items: center; gap: 4px; }
     </style>
@@ -218,7 +174,7 @@
 
                 <div class="flex items-center gap-2 w-full lg:w-auto flex-wrap justify-center font-bold">
                     <button onclick="openFormModal()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-blue-700 text-[10px] shadow-sm transition-all whitespace-nowrap uppercase tracking-wider"><i class="fas fa-plus mr-1"></i>Tambah</button>
-                    <button onclick="openExportModal()" class="bg-green-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-green-700 text-[10px] shadow-sm transition-all whitespace-nowrap uppercase tracking-wider"><i class="fas fa-file-excel mr-1"></i>Ekspor</button>
+                    <button onclick="exportToExcel()" class="bg-green-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-green-700 text-[10px] shadow-sm transition-all whitespace-nowrap uppercase tracking-wider"><i class="fas fa-file-excel mr-1"></i>Ekspor</button>
                     <button onclick="logoutAdmin()" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl font-bold hover:bg-red-100 text-[10px] transition-all whitespace-nowrap uppercase tracking-wider"><i class="fas fa-power-off mr-1"></i>Logout</button>
                 </div>
             </div>
@@ -326,53 +282,6 @@
         </div>
     </div>
 
-    <!-- Export Modal -->
-    <div id="exportModal" class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center opacity-0 pointer-events-none z-[160] font-medium">
-        <div class="modal-overlay absolute w-full h-full bg-slate-900/60 backdrop-blur-sm" onclick="closeExportModal()"></div>
-        <div class="modal-container bg-white w-11/12 md:max-w-xs mx-auto rounded-[2rem] shadow-2xl z-50 overflow-hidden">
-            <div class="p-8 text-center">
-                <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 mx-auto mb-6">
-                    <i class="fas fa-file-export text-2xl"></i>
-                </div>
-                <h2 class="text-xl font-black tracking-tighter mb-2">Pilih Format Ekspor</h2>
-                <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-8">Pilih ekstensi file</p>
-                
-                <div class="space-y-3">
-                    <button onclick="triggerExport('xls')" class="w-full py-4 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-2xl flex items-center justify-between px-6 transition-all group">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-file-excel text-green-600 text-lg"></i>
-                            <span class="font-black text-slate-700">Format .XLS</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-slate-300 group-hover:text-blue-500 transition-colors"></i>
-                    </button>
-                    <button onclick="triggerExport('xlsx')" class="w-full py-4 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-2xl flex items-center justify-between px-6 transition-all group">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-file-excel text-green-500 text-lg"></i>
-                            <span class="font-black text-slate-700">Format .XLSX</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-slate-300 group-hover:text-blue-500 transition-colors"></i>
-                    </button>
-                </div>
-                
-                <button onclick="closeExportModal()" class="mt-8 text-slate-400 font-bold text-xs uppercase tracking-widest hover:text-red-500 transition-colors">Tutup</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Photo Preview Modal -->
-    <div id="photoPreviewModal" class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center opacity-0 pointer-events-none z-[150] font-medium">
-        <div class="modal-overlay absolute w-full h-full bg-slate-900/90 backdrop-blur-md" onclick="closePhotoPreview()"></div>
-        <div class="relative z-50 flex flex-col items-center gap-4">
-            <button onclick="closePhotoPreview()" class="absolute -top-12 right-0 text-white text-3xl hover:text-blue-400 transition-colors">
-                <i class="fas fa-times-circle"></i>
-            </button>
-            <img id="previewImg" src="" alt="Preview" class="photo-preview-img">
-            <div class="bg-white/10 backdrop-blur-md px-6 py-2 rounded-full border border-white/20 text-center">
-                <h3 id="previewName" class="text-white font-black text-lg tracking-wide uppercase">Nama Peserta</h3>
-            </div>
-        </div>
-    </div>
-
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-10 right-10 bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-24 opacity-0 transition-all z-[200] flex items-center gap-3 font-bold">
         <i class="fas fa-check-circle text-green-400"></i><span id="toastMsg">Berhasil!</span>
@@ -380,11 +289,12 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
         // FIREBASE INITIALIZATION
-        const firebaseConfig = {
+        // Menggunakan config lingkungan jika tersedia, jika tidak pakai default user
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyBktFbXzld7ehIfV2YThx-VSkpaTYcFXNc",
             authDomain: "apks-pgri.firebaseapp.com",
             projectId: "apks-pgri",
@@ -397,7 +307,9 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = 'apks-pgri-konker';
+        
+        // App ID dari lingkungan atau default
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'apks-pgri-konker';
         const colPath = `artifacts/${appId}/public/data/peserta`;
         
         // --- HELPER CONSTANTS & FUNCTIONS ---
@@ -451,43 +363,6 @@
             setTimeout(() => t.classList.add('translate-y-24', 'opacity-0'), 3000);
         };
 
-        // --- PHOTO PREVIEW ACTIONS ---
-        window.openPhotoPreview = (src, name) => {
-            const modal = document.getElementById('photoPreviewModal');
-            const img = document.getElementById('previewImg');
-            const nameEl = document.getElementById('previewName');
-            img.src = src;
-            nameEl.innerText = name;
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            document.body.classList.add('modal-active');
-        };
-
-        window.closePhotoPreview = () => {
-            const modal = document.getElementById('photoPreviewModal');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            document.body.classList.remove('modal-active');
-        };
-
-        // --- EXPORT MODAL ACTIONS ---
-        window.openExportModal = () => {
-            document.getElementById('exportModal').classList.remove('opacity-0', 'pointer-events-none');
-            document.body.classList.add('modal-active');
-        };
-
-        window.closeExportModal = () => {
-            document.getElementById('exportModal').classList.add('opacity-0', 'pointer-events-none');
-            document.body.classList.remove('modal-active');
-        };
-
-        // --- GLOBAL ESC KEY LISTENER ---
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeFormModal();
-                closePhotoPreview();
-                closeExportModal();
-            }
-        });
-
         // --- DATA STATE ---
         let rawData = [];
         let state = [];
@@ -495,6 +370,7 @@
         let user = null;
         let currentSortAdmin = { column: 'no', direction: 'asc' };
 
+        // Data awal untuk migrasi pertama kali jika Firestore kosong
         const initialData = [
             { no: 1, utusan: "Pengurus Kabupaten", nama: "H. Sutoto", jk: "L", ukuran: "XL", wa: "081910984445", kamar: "01" },
             { no: 2, utusan: "Pengurus Kabupaten", nama: "M. Topan Subhi", jk: "L", ukuran: "XL", wa: "085920071200", kamar: "01" },
@@ -576,21 +452,16 @@
                 let rmHtml = roommates.length > 0 ? roommates.map(r => `
                     <div class="flex items-center justify-between mt-2 p-2 rounded-xl bg-blue-50/50 border border-blue-100/30">
                         <div class="flex items-center gap-3 min-w-0 flex-1">
-                            <img src="${getPhotoSource(r)}" 
-                                 onclick="openPhotoPreview(this.src, '${escapeJS(r.nama)}')"
-                                 class="photo-roommate" data-name="${r.nama}">
+                            <img src="${getPhotoSource(r)}" class="photo-roommate" data-name="${r.nama}" onerror="handleImageError(this, '${escapeJS(r.nama)}')">
                             <div class="min-w-0"><p class="text-[10px] font-bold text-blue-900 truncate">${r.nama}</p><p class="text-[8px] text-slate-400 font-bold uppercase truncate">${r.utusan}</p></div>
                         </div>
-                        <a href="${getWALink(r.wa)}" target="_blank" data-tooltip="Hubungi via WhatsApp" class="wa-small flex-shrink-0 ml-2 hover:scale-110 transition-transform"><i class="fab fa-whatsapp text-lg text-green-600"></i></a>
+                        <a href="${getWALink(r.wa)}" target="_blank" class="wa-small flex-shrink-0 ml-2 hover:scale-110 transition-transform"><i class="fab fa-whatsapp text-lg"></i></a>
                     </div>`).join("") : '<p class="text-[10px] italic text-gray-300 mt-1 pl-1 font-medium">Sendiri</p>';
 
                 html += `
-                    <div class="participant-card bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col h-full relative group">
+                    <div class="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col h-full relative overflow-hidden">
                         <div class="flex gap-4 mb-4">
-                            <img src="${getPhotoSource(p)}" 
-                                 onclick="openPhotoPreview(this.src, '${escapeJS(p.nama)}')" 
-                                 class="participant-photo" 
-                                 data-name="${p.nama}">
+                            <img src="${getPhotoSource(p)}" class="participant-photo" data-name="${p.nama}" onerror="handleImageError(this, '${escapeJS(p.nama)}')">
                             <div class="flex-1 min-w-0">
                                 <div class="flex justify-between items-start"><span class="bg-blue-600 text-white px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase">Kamar ${p.kamar || '--'}</span><span class="text-[9px] text-gray-300 font-bold font-mono">#${p.no}</span></div>
                                 <h3 class="font-black text-slate-800 text-sm mt-2 truncate">${p.nama}</h3>
@@ -598,7 +469,7 @@
                                 <div class="flex flex-wrap gap-1.5 mt-3 items-center">
                                     <span class="text-[9px] bg-slate-100 px-2.5 py-0.5 rounded-full font-bold">Kaos: ${p.ukuran}</span>
                                     <span class="text-[9px] ${p.jk==='L'?'bg-blue-50 text-blue-700':'bg-pink-50 text-pink-700'} px-2.5 py-0.5 rounded-full font-bold">${p.jk==='L'?'Laki-Laki':'Perempuan'}</span>
-                                    <a href="${getWALink(p.wa)}" target="_blank" data-tooltip="Klik Kirim Pesan WA" class="badge-base badge-wa"><i class="fab fa-whatsapp"></i> Hubungi</a>
+                                    <a href="${getWALink(p.wa)}" target="_blank" class="badge-base badge-wa"><i class="fab fa-whatsapp"></i> Hubungi</a>
                                 </div>
                             </div>
                         </div>
@@ -618,17 +489,12 @@
             tbody.innerHTML = sortedData.map(p => `
                 <tr class="hover:bg-blue-50/50 transition-colors border-b font-medium text-slate-700">
                     <td class="px-6 py-4 text-xs font-mono font-bold">${p.no}</td>
-                    <td class="px-6 py-4">
-                        <img src="${getPhotoSource(p)}" 
-                             onclick="openPhotoPreview(this.src, '${escapeJS(p.nama)}')" 
-                             class="photo-small shadow-sm" 
-                             data-name="${p.nama}">
-                    </td>
+                    <td class="px-6 py-4"><img src="${getPhotoSource(p)}" class="photo-small shadow-sm" data-name="${p.nama}" onerror="handleImageError(this, '${escapeJS(p.nama)}')"></td>
                     <td class="px-6 py-4 font-black text-blue-700 text-center">${p.kamar || '--'}</td>
                     <td class="px-6 py-4"><p class="font-black text-slate-800">${p.nama}</p><p class="text-[10px] font-bold uppercase opacity-50">${p.utusan}</p></td>
                     <td class="px-6 py-4 text-center">${p.jk==='L'?'Laki-Laki':'Perempuan'}</td>
                     <td class="px-4 py-4 text-center font-black">${p.ukuran}</td>
-                    <td class="px-6 py-4 text-center"><a href="${getWALink(p.wa)}" target="_blank" data-tooltip="WhatsApp: ${p.wa || '-'}" class="text-green-600 hover:text-green-700 flex items-center justify-center gap-2 font-mono text-xs font-bold bg-green-50 py-1.5 rounded-xl border border-green-100 relative group"><i class="fab fa-whatsapp"></i> ${p.wa || '-'}</a></td>
+                    <td class="px-6 py-4 text-center"><a href="${getWALink(p.wa)}" target="_blank" class="text-green-600 hover:text-green-700 flex items-center justify-center gap-2 font-mono text-xs font-bold bg-green-50 py-1.5 rounded-xl border border-green-100"><i class="fab fa-whatsapp"></i> ${p.wa || '-'}</a></td>
                     <td class="px-6 py-4 text-center"><div class="flex justify-center gap-2"><button onclick="openFormModal(${p.no})" class="bg-amber-100 text-amber-600 p-2.5 rounded-xl hover:bg-amber-200 shadow-sm"><i class="fas fa-edit"></i></button><button onclick="confirmDelete('${escapeJS(p.firebaseId)}')" class="bg-red-50 text-red-400 p-2.5 rounded-xl hover:text-red-600 hover:bg-red-100 shadow-sm"><i class="fas fa-trash-alt"></i></button></div></td>
                 </tr>`).join('');
             attachImageListeners();
@@ -638,7 +504,9 @@
         window.switchTab = (tab) => {
             const isDash = tab === 'dashboard';
             const isAdmin = tab === 'admin';
+            
             document.getElementById('tab-dashboard').classList.toggle('hidden', !isDash);
+            
             const isLogged = !document.getElementById('tab-admin-content').classList.contains('hidden');
             if (isAdmin) {
                 if (isLogged) {
@@ -652,6 +520,7 @@
                 document.getElementById('tab-admin-auth').classList.add('hidden');
                 document.getElementById('tab-admin-content').classList.add('hidden');
             }
+            
             document.getElementById('btn-dashboard').classList.toggle('tab-active', isDash);
             document.getElementById('btn-admin').classList.toggle('tab-active', isAdmin);
         };
@@ -679,13 +548,13 @@
             const s = document.getElementById('searchInput').value.toLowerCase();
             const u = document.getElementById('filterUtusan').value;
             const g = document.getElementById('filterGender').value;
-            state = rawData.filter(p => (p.nama.toLowerCase().includes(s) || (p.utusan || "").toLowerCase().includes(s)) && (u === "" || (p.utusan || "").includes(u)) && (g === "" || p.jk === g));
+            state = rawData.filter(p => (p.nama.toLowerCase().includes(s) || p.utusan.toLowerCase().includes(s)) && (u === "" || p.utusan.includes(u)) && (g === "" || p.jk === g));
             renderDashboard();
         };
 
         window.filterAdminData = () => {
             const s = document.getElementById('adminSearchInput').value.toLowerCase();
-            adminState = rawData.filter(p => (p.nama.toLowerCase().includes(s) || (p.utusan || "").toLowerCase().includes(s)));
+            adminState = rawData.filter(p => (p.nama.toLowerCase().includes(s) || p.utusan.toLowerCase().includes(s)));
             const badge = document.getElementById('adminFoundBadge');
             if (s) {
                 badge.classList.remove('hidden');
@@ -750,6 +619,7 @@
         };
 
         window.confirmDelete = async (fId) => {
+            if (!user) return;
             if (confirm("Hapus data peserta dari database?")) {
                 try {
                     await deleteDoc(doc(db, ...colPath.split('/'), fId));
@@ -760,93 +630,16 @@
             }
         };
 
-        window.triggerExport = (format) => {
+        window.exportToExcel = () => {
             const now = new Date();
-            const timestamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}.${String(now.getMinutes()).padStart(2,'0')}.${String(now.getSeconds()).padStart(2,'0')}`;
-            const fileName = `Data Peserta Konkerprov I PGRI Banten_Pandeglang ${timestamp}.${format}`;
-            
-            // Prepare Data Table for Export
-            const sortedExportData = [...adminState].sort((a,b) => a.no - b.no);
-
-            if (format === 'xlsx') {
-                const wsData = [
-                    ["DAFTAR PESERTA KONKERPROV I PGRI BANTEN"],
-                    [`Diunduh pada: ${now.toLocaleString('id-ID')}`],
-                    ["Developed by Edi Brata"],
-                    [], // Blank line
-                    ["No", "Kamar", "Nama Peserta", "L/P", "Kaos", "Asal Utusan", "WhatsApp"]
-                ];
-
-                sortedExportData.forEach(p => {
-                    wsData.push([p.no, p.kamar || '-', p.nama, p.jk, p.ukuran, p.utusan, p.wa || '-']);
-                });
-
-                const wb = XLSX.utils.book_new();
-                const ws = XLSX.utils.aoa_to_sheet(wsData);
-                
-                // Set Column Widths
-                ws['!cols'] = [
-                    {wch: 5}, {wch: 8}, {wch: 35}, {wch: 5}, {wch: 8}, {wch: 30}, {wch: 20}
-                ];
-
-                XLSX.utils.book_append_sheet(wb, ws, "Data Peserta");
-                XLSX.writeFile(wb, fileName);
-            } else {
-                // Formatting for XLS (Legacy HTML based)
-                let tableHtml = `
-                    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-                    <head><meta charset="UTF-8">
-                    <style>
-                        table { border-collapse: collapse; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-                        .title { font-size: 16pt; font-weight: bold; color: #1d4ed8; text-align: center; }
-                        .header { background-color: #1d4ed8; color: #ffffff; font-weight: bold; border: 1px solid #000; text-align: center; }
-                        td { border: 1px solid #ccc; padding: 5px; }
-                        .center { text-align: center; }
-                        .bold { font-weight: bold; }
-                    </style>
-                    </head>
-                    <body>
-                    <table>
-                        <tr><th colspan="7" class="title">DAFTAR PESERTA KONKERPROV I PGRI BANTEN</th></tr>
-                        <tr><th colspan="7" style="text-align:center">Developed by Edi Brata - Diunduh pada: ${now.toLocaleString('id-ID')}</th></tr>
-                        <tr><td colspan="7"></td></tr>
-                        <thead>
-                            <tr>
-                                <th class="header">No</th>
-                                <th class="header">Kamar</th>
-                                <th class="header">Nama Peserta</th>
-                                <th class="header">L/P</th>
-                                <th class="header">Kaos</th>
-                                <th class="header">Utusan</th>
-                                <th class="header">WhatsApp</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
-                
-                sortedExportData.forEach(p => {
-                    tableHtml += `
-                        <tr>
-                            <td class="center">${p.no}</td>
-                            <td class="center bold" style="color: #1d4ed8">${p.kamar || '-'}</td>
-                            <td>${p.nama}</td>
-                            <td class="center">${p.jk}</td>
-                            <td class="center">${p.ukuran}</td>
-                            <td>${p.utusan}</td>
-                            <td class="center">${p.wa || '-'}</td>
-                        </tr>`;
-                });
-
-                tableHtml += `</tbody></table></body></html>`;
-
-                const uri = 'data:application/vnd.ms-excel;base64,' + btoa(unescape(encodeURIComponent(tableHtml)));
-                const link = document.createElement("a");
-                link.href = uri;
-                link.download = fileName;
-                link.click();
-            }
-            
-            closeExportModal();
-            showToast(`File .${format.toUpperCase()} Berhasil Diunduh`);
+            let t = `<table border="1"><thead><tr><th colspan="7">DAFTAR PESERTA KONKERPROV I PGRI BANTEN</th></tr><tr><th colspan="7">Developed by Edi Brata - Diunduh pada: ${now.toLocaleString('id-ID')}</th></tr><tr><th>No</th><th>Kamar</th><th>Nama Peserta</th><th>JK</th><th>Kaos</th><th>Utusan</th><th>WhatsApp</th></tr></thead><tbody>`;
+            [...adminState].sort((a,b)=>a.no-b.no).forEach(p => {
+                t += `<tr><td>${p.no}</td><td>${p.kamar || '--'}</td><td>${p.nama}</td><td>${p.jk==='L'?'Laki-Laki':'Perempuan'}</td><td>${p.ukuran}</td><td>${p.utusan}</td><td>${p.wa || '-'}</td></tr>`;
+            });
+            t += `</tbody></table>`;
+            const fileName = `Data Peserta Konkerprov I PGRI Banten_Pandeglang ${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}.${String(now.getMinutes()).padStart(2,'0')}.${String(now.getSeconds()).padStart(2,'0')}.xls`;
+            const uri = 'data:application/vnd.ms-excel;base64,' + btoa(unescape(encodeURIComponent(t)));
+            const link = document.createElement("a"); link.href = uri; link.download = fileName; link.click();
         };
 
         window.togglePasswordVisibility = () => {
@@ -858,33 +651,58 @@
 
         // --- FIREBASE SYNC & INITIALIZATION ---
         const initAuth = async () => {
-            try { await signInAnonymously(auth); } catch (err) { console.error("Auth Failure:", err); }
+            try {
+                // Gunakan token kustom jika disediakan oleh lingkungan Canvas
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.error("Auth Failure:", err);
+            }
         };
-        initAuth();
 
         const syncInitialDataIfEmpty = async (colRef) => {
+            if (!user) return;
             const snapshot = await getDocs(colRef);
             if (snapshot.empty) {
+                console.log("Firestore kosong. Mengunggah data awal...");
                 for (const item of initialData) {
                     await setDoc(doc(db, ...colPath.split('/'), item.no.toString()), item);
                 }
             }
         };
 
+        // Listen status login
         onAuthStateChanged(auth, async (u) => {
             user = u;
             if (u) {
                 const colRef = collection(db, ...colPath.split('/'));
+                // Jalankan inisialisasi data jika koleksi baru
                 await syncInitialDataIfEmpty(colRef);
+                
+                // Real-time listener
                 onSnapshot(colRef, (snapshot) => {
                     rawData = snapshot.docs.map(doc => ({ ...doc.data(), firebaseId: doc.id }));
                     rawData.sort((a,b) => a.no - b.no);
                     state = [...rawData];
                     adminState = [...rawData];
-                    renderRecap(); renderDashboard(); renderAdminTable();
-                }, (err) => console.error("Firestore Error:", err));
+                    renderRecap(); 
+                    renderDashboard(); 
+                    renderAdminTable();
+                }, (err) => {
+                    console.error("Firestore Error:", err);
+                    if (err.code === 'permission-denied') {
+                        console.warn("Mencoba refresh autentikasi...");
+                        initAuth();
+                    }
+                });
             }
         });
+
+        // Jalankan Autentikasi segera
+        initAuth();
 
         // Setup Form Submit
         document.getElementById('participantForm').onsubmit = (e) => {
@@ -892,6 +710,7 @@
             window.saveParticipant();
         };
 
+        // Jam digital header
         setInterval(() => { 
             const now = new Date();
             document.getElementById('currentTime').innerText = now.toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' }); 
