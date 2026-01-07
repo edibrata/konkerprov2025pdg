@@ -153,8 +153,8 @@
                         </select>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="relative">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="relative lg:col-span-1">
                         <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
                         <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Cari nama peserta..." 
                                class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-sm text-slate-700">
@@ -164,6 +164,22 @@
                             <option value="">Semua Utusan</option>
                             <option value="Kabupaten">Pengurus Kabupaten</option>
                             <option value="Cabang">Pengurus Cabang</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="filterKelompok" onchange="filterData()" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none appearance-none bg-white cursor-pointer font-bold text-sm text-slate-700">
+                            <option value="">Semua Komisi</option>
+                            <option value="Komisi A Organisasi dan Keanggotaan">Komisi A</option>
+                            <option value="Komisi B Program Kerja">Komisi B</option>
+                            <option value="Komisi C Pengelolaan Keuangan">Komisi C</option>
+                            <option value="Komisi D Pernyataan dan Rekomendasi">Komisi D</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="filterKunci" onchange="filterData()" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none appearance-none bg-white cursor-pointer font-bold text-sm text-slate-700">
+                            <option value="">Kunci Kamar (Semua)</option>
+                            <option value="Sudah">Kunci: Sudah Ambil</option>
+                            <option value="Belum">Kunci: Belum Ambil</option>
                         </select>
                     </div>
                     <div>
@@ -192,6 +208,10 @@
                         <button type="button" onclick="togglePasswordVisibility()" class="absolute right-4 top-9 text-gray-400 hover:text-blue-600">
                             <i id="passwordIcon" class="fas fa-eye"></i>
                         </button>
+                    </div>
+                    <div class="flex items-center gap-2 px-1">
+                        <input type="checkbox" id="rememberMe" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+                        <label for="rememberMe" class="text-xs font-bold text-slate-500 cursor-pointer">Ingat Saya</label>
                     </div>
                     <button onclick="loginAdmin()" class="w-full bg-blue-700 text-white py-4 rounded-xl font-black hover:bg-blue-800 transition-all shadow-lg uppercase tracking-widest text-xs">Masuk</button>
                     <p id="loginError" class="text-red-500 text-xs text-center hidden font-bold mt-2">Password salah!</p>
@@ -231,8 +251,10 @@
                             <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Foto</th>
                             <th onclick="sortAdmin('kamar')" class="sortable px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Kamar</th>
                             <th onclick="sortAdmin('nama')" class="sortable px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Nama Peserta</th>
-                            <th onclick="sortAdmin('jk')" class="sortable px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Jenis Kelamin</th>
-                            <th class="px-4 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Ukuran Kaos</th>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Kelompok</th>
+                            <th onclick="sortAdmin('jk')" class="sortable px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">L/P</th>
+                            <th class="px-4 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Kaos</th>
+                            <th class="px-4 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Kunci</th>
                             <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase text-center">WhatsApp</th>
                             <th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase text-center">Aksi</th>
                         </tr>
@@ -280,6 +302,17 @@
                     </div>
 
                     <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Kelompok (Komisi)</label>
+                        <select id="formKelompok" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 outline-none appearance-none cursor-pointer">
+                            <option value="">--Pilih--</option>
+                            <option value="Komisi A Organisasi dan Keanggotaan">Komisi A Organisasi dan Keanggotaan</option>
+                            <option value="Komisi B Program Kerja">Komisi B Program Kerja</option>
+                            <option value="Komisi C Pengelolaan Keuangan">Komisi C Pengelolaan Keuangan</option>
+                            <option value="Komisi D Pernyataan dan Rekomendasi">Komisi D Pernyataan dan Rekomendasi</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
                         <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Tautan Foto GitHub (Opsional)</label>
                         <input type="url" id="formFotoUrl" placeholder="https://github.com/..." class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-medium text-xs text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
@@ -307,10 +340,19 @@
                                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-800 text-center transition-all">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">WhatsApp</label>
-                            <input type="text" id="formWA" placeholder="08..." 
-                                   class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-800 transition-all">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Ambil Kunci Kamar</label>
+                            <select id="formKunci" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 outline-none appearance-none cursor-pointer">
+                                <option value="">--Pilih--</option>
+                                <option value="Sudah">Sudah</option>
+                                <option value="Belum">Belum</option>
+                            </select>
                         </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">WhatsApp</label>
+                        <input type="text" id="formWA" placeholder="08..." 
+                               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-800 transition-all">
                     </div>
 
                     <div class="pt-4 flex justify-end gap-3 font-bold">
@@ -380,7 +422,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
         // FIREBASE INITIALIZATION
@@ -496,50 +538,10 @@
         let currentSortAdmin = { column: 'no', direction: 'asc' };
 
         const initialData = [
-            { no: 1, utusan: "Pengurus Kabupaten", nama: "H. Sutoto", jk: "L", ukuran: "XL", wa: "081910984445", kamar: "01" },
-            { no: 2, utusan: "Pengurus Kabupaten", nama: "M. Topan Subhi", jk: "L", ukuran: "XL", wa: "085920071200", kamar: "01" },
-            { no: 3, utusan: "Pengurus Kabupaten", nama: "H. Rianto Danardono", jk: "L", ukuran: "L", wa: "081399007166", kamar: "02" },
-            { no: 4, utusan: "Pengurus Kabupaten", nama: "Ikhwan Zainudin", jk: "L", ukuran: "L", wa: "081387565928", kamar: "02" },
-            { no: 5, utusan: "Pengurus Kabupaten", nama: "Hj. Ipah Latipah", jk: "P", ukuran: "2L", wa: "081511870124", kamar: "04" },
-            { no: 6, utusan: "Pengurus Kabupaten", nama: "Edi Brata", jk: "L", ukuran: "XL", wa: "087773949015", kamar: "03" },
-            { no: 7, utusan: "Pengurus Perwakilan YPLP", nama: "Ruli Purnama YPLP", jk: "L", ukuran: "XL", wa: "081808927614", kamar: "03" },
-            { no: 8, utusan: "Pengurus Cabang Angsana", nama: "Rosad Angsana", jk: "L", ukuran: "L", wa: "083103360596", kamar: "06" },
-            { no: 9, utusan: "Pengurus Cabang Banjar", nama: "Dede Hermansyah Banjar", jk: "L", ukuran: "L", wa: "087773646747", kamar: "06" },
-            { no: 10, utusan: "Pengurus Cabang Bojong", nama: "Neneng Ratnasari Bojong", jk: "P", ukuran: "XL", wa: "085311525559", kamar: "04" },
-            { no: 11, utusan: "Pengurus Cabang Cadasari", nama: "Dedi Efendi Cadasari", jk: "L", ukuran: "XL", wa: "087773135313", kamar: "07" },
-            { no: 12, utusan: "Pengurus Cabang Carita", nama: "Ahmad Fahroji Carita", jk: "L", ukuran: "L", wa: "087755534467", kamar: "07" },
-            { no: 13, utusan: "Pengurus Cabang Cibaliung", nama: "Budiyono Cibaliung", jk: "L", ukuran: "XL", wa: "085218336788", kamar: "08" },
-            { no: 14, utusan: "Pengurus Cabang Cibitung", nama: "H. Aik Moh Tasrik Cibitung", jk: "L", ukuran: "L", wa: "085693523882", kamar: "08" },
-            { no: 15, utusan: "Pengurus Cabang Cigeulis", nama: "Muhamad Furkon Cigeulis", jk: "L", ukuran: "XL", wa: "083822071608", kamar: "09" },
-            { no: 16, utusan: "Pengurus Cabang Cikedal", nama: "Aa Hidayat Cikedal", jk: "L", ukuran: "2L", wa: "087866262924", kamar: "09" },
-            { no: 17, utusan: "Pengurus Cabang Cikeusik", nama: "Uci Sauci Cikeusik", jk: "L", ukuran: "2L", wa: "085886919799", kamar: "10" },
-            { no: 18, utusan: "Pengurus Cabang Cimanggu", nama: "Tohirin Cimanggu", jk: "L", ukuran: "L", wa: "085720814429", kamar: "10" },
-            { no: 19, utusan: "Pengurus Cabang Cimanuk", nama: "Didi Supardi Cimanuk", jk: "L", ukuran: "M", wa: "085215587434", kamar: "11" },
-            { no: 20, utusan: "Pengurus Cabang Cipeucang", nama: "Odang Sumarno Cipeucang", jk: "L", ukuran: "2L", wa: "08568456052", kamar: "11" },
-            { no: 21, utusan: "Pengurus Cabang Cisata", nama: "Ade Safrudin Cisata", jk: "L", ukuran: "L", wa: "081314464192", kamar: "12" },
-            { no: 22, utusan: "Pengurus Cabang Jiput", nama: "Moch. Yusuf Jiput", jk: "L", ukuran: "L", wa: "081280289286", kamar: "12" },
-            { no: 23, utusan: "Pengurus Cabang Kaduhejo", nama: "Jaja Sunarja Kaduhejo", jk: "L", ukuran: "L", wa: "081806031359", kamar: "13" },
-            { no: 24, utusan: "Pengurus Cabang Kaduhejo", nama: "Suhernawati Kaduhejo", jk: "P", ukuran: "XL", wa: "085774532934", kamar: "05" },
-            { no: 25, utusan: "Pengurus Cabang Kaduhejo", nama: "Hasbi Asydiqi Kaduhejo", jk: "L", ukuran: "M", wa: "089666133956", kamar: "13" },
-            { no: 26, utusan: "Pengurus Cabang Karang Tanjung", nama: "Mohamad Jajuli Karang Tanjung", jk: "L", ukuran: "L", wa: "085770987728", kamar: "14" },
-            { no: 27, utusan: "Pengurus Cabang Koroncong", nama: "Hj. Bai Badariah Koroncong", jk: "P", ukuran: "2L", wa: "081316372837", kamar: "05" },
-            { no: 28, utusan: "Pengurus Cabang Labuan", nama: "Jupri Labuan", jk: "L", ukuran: "L", wa: "083841205992", kamar: "14" },
-            { no: 29, utusan: "Pengurus Cabang Majasari", nama: "Rupyadi Majasari", jk: "L", ukuran: "XL", wa: "085772847941", kamar: "15" },
-            { no: 30, utusan: "Pengurus Cabang Mandalawangi", nama: "Mahpudin Mandalawangi", jk: "L", ukuran: "L", wa: "081284423706", kamar: "15" },
-            { no: 31, utusan: "Pengurus Cabang Mekarjaya", nama: "Ecep Ahmad Rifa'i Mekarjaya", jk: "L", ukuran: "L", wa: "085692444441", kamar: "16" },
-            { no: 32, utusan: "Pengurus Cabang Menes", nama: "Yayah Sunariah Menes", jk: "P", ukuran: "2L", wa: "085211773625", kamar: "22" },
-            { no: 33, utusan: "Pengurus Cabang Munjul", nama: "Sasa Suja'i Munjul", jk: "L", ukuran: "L", wa: "081295387876", kamar: "16" },
-            { no: 34, utusan: "Pengurus Cabang Pagelaran", nama: "Nana Suhana Pagelaran", jk: "L", ukuran: "L", wa: "083807390903", kamar: "17" },
-            { no: 35, utusan: "Pengurus Cabang Pandeglang", nama: "H. Suherman Pandeglang", jk: "L", ukuran: "L", wa: "085288535522", kamar: "17" },
-            { no: 36, utusan: "Pengurus Cabang Panimbang", nama: "Yaya Rukbi Panimbang", jk: "L", ukuran: "M", wa: "081910867055", kamar: "18" },
-            { no: 37, utusan: "Pengurus Cabang Patia", nama: "Taufik Ahmad Patia", jk: "L", ukuran: "L", wa: "081210288753", kamar: "18" },
-            { no: 38, utusan: "Pengurus Cabang Picung", nama: "Didi Setiadi Picung", jk: "L", ukuran: "L", wa: "081310553057", kamar: "19" },
-            { no: 39, utusan: "Pengurus Cabang Pulosari", nama: "Jupri Pulosari", jk: "L", ukuran: "L", wa: "087809646667", kamar: "19" },
-            { no: 40, utusan: "Pengurus Cabang Saketi", nama: "Muhammad Ali Saketi", jk: "L", ukuran: "L", wa: "085959417818", kamar: "20" },
-            { no: 41, utusan: "Pengurus Cabang Sindangresmi", nama: "Hidayatullah Sindangresmi", jk: "L", ukuran: "M", wa: "085691103688", kamar: "20" },
-            { no: 42, utusan: "Pengurus Cabang Sobang", nama: "Jumino Sobang", jk: "L", ukuran: "XL", wa: "085819302746", kamar: "21" },
-            { no: 43, utusan: "Pengurus Cabang Sukaresmi", nama: "Saefullah Sukaresmi", jk: "L", ukuran: "L", wa: "083813109255", kamar: "21" },
-            { no: 44, utusan: "Pengurus Cabang Sumur", nama: "Asep Sumarna Sumur", jk: "L", ukuran: "M", wa: "085718748164", kamar: "22" }
+            { no: 1, utusan: "Pengurus Kabupaten", nama: "H. Sutoto", jk: "L", ukuran: "XL", wa: "081910984445", kamar: "01", kelompok: "Komisi A Organisasi dan Keanggotaan", kunci: "Sudah" },
+            { no: 2, utusan: "Pengurus Kabupaten", nama: "M. Topan Subhi", jk: "L", ukuran: "XL", wa: "085920071200", kamar: "01", kelompok: "Komisi B Program Kerja", kunci: "Sudah" },
+            { no: 3, utusan: "Pengurus Kabupaten", nama: "H. Rianto Danardono", jk: "L", ukuran: "L", wa: "081399007166", kamar: "02", kelompok: "Komisi C Pengelolaan Keuangan", kunci: "Belum" },
+            { no: 4, utusan: "Pengurus Kabupaten", nama: "Ikhwan Zainudin", jk: "L", ukuran: "L", wa: "081387565928", kamar: "02", kelompok: "Komisi D Pernyataan dan Rekomendasi", kunci: "Belum" }
         ];
 
         // --- RENDER FUNCTIONS ---
@@ -566,7 +568,7 @@
             let sorted = [...state].sort((a, b) => sortBy === 'kamar' ? (a.kamar || "99").localeCompare(b.kamar || "99", undefined, {numeric: true}) : a.no - b.no);
             
             const foundEl = document.getElementById('dashboardFound');
-            if (document.getElementById('searchInput').value || document.getElementById('filterUtusan').value || document.getElementById('filterGender').value) {
+            if (document.getElementById('searchInput').value || document.getElementById('filterUtusan').value || document.getElementById('filterKelompok').value || document.getElementById('filterKunci').value || document.getElementById('filterGender').value) {
                 foundEl.classList.remove('hidden'); document.getElementById('foundCount').innerText = state.length;
             } else foundEl.classList.add('hidden');
 
@@ -594,10 +596,11 @@
                             <div class="flex-1 min-w-0">
                                 <div class="flex justify-between items-start"><span class="bg-blue-600 text-white px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase">Kamar ${p.kamar || '--'}</span><span class="text-[9px] text-gray-300 font-bold font-mono">#${p.no}</span></div>
                                 <h3 class="font-black text-slate-800 text-sm mt-2 truncate">${p.nama}</h3>
-                                <p class="text-[10px] text-slate-500 mt-1 truncate font-bold uppercase"><i class="fas fa-building mr-1 text-blue-400"></i>${p.utusan}</p>
+                                <p class="text-[10px] text-slate-500 mt-0.5 truncate font-bold uppercase"><i class="fas fa-building mr-1 text-blue-400"></i>${p.utusan}</p>
+                                <p class="text-[9px] text-blue-600 mt-0.5 truncate font-black"><i class="fas fa-layer-group mr-1 text-blue-400"></i>${p.kelompok || '--Belum Masuk Kelompok/Komisi--'}</p>
                                 <div class="flex flex-wrap gap-1.5 mt-3 items-center">
-                                    <span class="text-[9px] bg-slate-100 px-2.5 py-0.5 rounded-full font-bold">Kaos: ${p.ukuran}</span>
-                                    <span class="text-[9px] ${p.jk==='L'?'bg-blue-50 text-blue-700':'bg-pink-50 text-pink-700'} px-2.5 py-0.5 rounded-full font-bold">${p.jk==='L'?'Laki-Laki':'Perempuan'}</span>
+                                    <span class="text-[9px] bg-slate-100 px-2 py-0.5 rounded-full font-bold">Kaos: ${p.ukuran}</span>
+                                    <span class="text-[9px] ${p.kunci === 'Sudah' ? 'bg-green-100 text-green-700' : 'bg-red-50 text-red-600'} px-2 py-0.5 rounded-full font-bold">Kunci: ${p.kunci || 'Belum'}</span>
                                     <a href="${getWALink(p.wa)}" target="_blank" data-tooltip="Klik Kirim Pesan WA" class="badge-base badge-wa"><i class="fab fa-whatsapp"></i> Hubungi</a>
                                 </div>
                             </div>
@@ -626,8 +629,10 @@
                     </td>
                     <td class="px-6 py-4 font-black text-blue-700 text-center">${p.kamar || '--'}</td>
                     <td class="px-6 py-4"><p class="font-black text-slate-800">${p.nama}</p><p class="text-[10px] font-bold uppercase opacity-50">${p.utusan}</p></td>
-                    <td class="px-6 py-4 text-center">${p.jk==='L'?'Laki-Laki':'Perempuan'}</td>
+                    <td class="px-6 py-4"><span class="text-[10px] font-bold text-blue-600">${p.kelompok || '-'}</span></td>
+                    <td class="px-6 py-4 text-center">${p.jk}</td>
                     <td class="px-4 py-4 text-center font-black">${p.ukuran}</td>
+                    <td class="px-4 py-4 text-center"><span class="text-[10px] font-black ${p.kunci==='Sudah'?'text-green-600':'text-red-500'}">${p.kunci || 'Belum'}</span></td>
                     <td class="px-6 py-4 text-center"><a href="${getWALink(p.wa)}" target="_blank" data-tooltip="WhatsApp: ${p.wa || '-'}" class="text-green-600 hover:text-green-700 flex items-center justify-center gap-2 font-mono text-xs font-bold bg-green-50 py-1.5 rounded-xl border border-green-100 relative group"><i class="fab fa-whatsapp"></i> ${p.wa || '-'}</a></td>
                     <td class="px-6 py-4 text-center"><div class="flex justify-center gap-2"><button onclick="openFormModal(${p.no})" class="bg-amber-100 text-amber-600 p-2.5 rounded-xl hover:bg-amber-200 shadow-sm"><i class="fas fa-edit"></i></button><button onclick="confirmDelete('${escapeJS(p.firebaseId)}')" class="bg-red-50 text-red-400 p-2.5 rounded-xl hover:text-red-600 hover:bg-red-100 shadow-sm"><i class="fas fa-trash-alt"></i></button></div></td>
                 </tr>`).join('');
@@ -639,11 +644,16 @@
             const isDash = tab === 'dashboard';
             const isAdmin = tab === 'admin';
             document.getElementById('tab-dashboard').classList.toggle('hidden', !isDash);
-            const isLogged = !document.getElementById('tab-admin-content').classList.contains('hidden');
+            
+            // Check session from localStorage if present
+            const hasSession = localStorage.getItem('admin_session') === 'active';
+            const isLogged = hasSession || !document.getElementById('tab-admin-content').classList.contains('hidden');
+
             if (isAdmin) {
                 if (isLogged) {
                     document.getElementById('tab-admin-auth').classList.add('hidden');
                     document.getElementById('tab-admin-content').classList.remove('hidden');
+                    renderAdminTable();
                 } else {
                     document.getElementById('tab-admin-auth').classList.remove('hidden');
                     document.getElementById('tab-admin-content').classList.add('hidden');
@@ -658,6 +668,10 @@
 
         window.loginAdmin = () => {
             if (document.getElementById('adminPassword').value === "EdiBrata#1") {
+                // If remember me is checked, save session
+                if (document.getElementById('rememberMe').checked) {
+                    localStorage.setItem('admin_session', 'active');
+                }
                 document.getElementById('tab-admin-auth').classList.add('hidden');
                 document.getElementById('tab-admin-content').classList.remove('hidden');
                 renderAdminTable();
@@ -669,6 +683,8 @@
         };
 
         window.logoutAdmin = () => {
+            // Clear session on logout
+            localStorage.removeItem('admin_session');
             document.getElementById('tab-admin-content').classList.add('hidden');
             document.getElementById('tab-admin-auth').classList.remove('hidden');
             document.getElementById('adminPassword').value = '';
@@ -678,8 +694,19 @@
         window.filterData = () => {
             const s = document.getElementById('searchInput').value.toLowerCase();
             const u = document.getElementById('filterUtusan').value;
+            const k = document.getElementById('filterKelompok').value;
+            const kn = document.getElementById('filterKunci').value;
             const g = document.getElementById('filterGender').value;
-            state = rawData.filter(p => (p.nama.toLowerCase().includes(s) || (p.utusan || "").toLowerCase().includes(s)) && (u === "" || (p.utusan || "").includes(u)) && (g === "" || p.jk === g));
+
+            state = rawData.filter(p => {
+                const matchSearch = (p.nama.toLowerCase().includes(s) || (p.utusan || "").toLowerCase().includes(s));
+                const matchUtusan = (u === "" || (p.utusan || "").includes(u));
+                const matchKelompok = (k === "" || p.kelompok === k);
+                const matchKunci = (kn === "" || (p.kunci || "Belum") === kn);
+                const matchGender = (g === "" || p.jk === g);
+                
+                return matchSearch && matchUtusan && matchKelompok && matchKunci && matchGender;
+            });
             renderDashboard();
         };
 
@@ -714,6 +741,8 @@
                 document.getElementById('formKamar').value = d.kamar || "";
                 document.getElementById('formWA').value = d.wa || "";
                 document.getElementById('formFotoUrl').value = d.fotoUrl || "";
+                document.getElementById('formKelompok').value = d.kelompok || "";
+                document.getElementById('formKunci').value = d.kunci || "";
             } else {
                 document.getElementById('modalTitle').innerText = "Daftar Peserta Baru";
             }
@@ -737,7 +766,9 @@
                 ukuran: document.getElementById('formUkuran').value,
                 kamar: document.getElementById('formKamar').value,
                 wa: document.getElementById('formWA').value,
-                fotoUrl: document.getElementById('formFotoUrl').value || ""
+                fotoUrl: document.getElementById('formFotoUrl').value || "",
+                kelompok: document.getElementById('formKelompok').value,
+                kunci: document.getElementById('formKunci').value
             };
 
             try {
@@ -765,7 +796,6 @@
             const timestamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}.${String(now.getMinutes()).padStart(2,'0')}.${String(now.getSeconds()).padStart(2,'0')}`;
             const fileName = `Data Peserta Konkerprov I PGRI Banten_Pandeglang ${timestamp}.${format}`;
             
-            // Prepare Data Table for Export
             const sortedExportData = [...adminState].sort((a,b) => a.no - b.no);
 
             if (format === 'xlsx') {
@@ -773,26 +803,20 @@
                     ["DAFTAR PESERTA KONKERPROV I PGRI BANTEN"],
                     [`Diunduh pada: ${now.toLocaleString('id-ID')}`],
                     ["Developed by Edi Brata"],
-                    [], // Blank line
-                    ["No", "Kamar", "Nama Peserta", "L/P", "Kaos", "Asal Utusan", "WhatsApp"]
+                    [],
+                    ["No", "Kamar", "Nama Peserta", "Kelompok", "L/P", "Kaos", "Kunci", "Asal Utusan", "WhatsApp"]
                 ];
 
                 sortedExportData.forEach(p => {
-                    wsData.push([p.no, p.kamar || '-', p.nama, p.jk, p.ukuran, p.utusan, p.wa || '-']);
+                    wsData.push([p.no, p.kamar || '-', p.nama, p.kelompok || '-', p.jk, p.ukuran, p.kunci || '-', p.utusan, p.wa || '-']);
                 });
 
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
-                
-                // Set Column Widths
-                ws['!cols'] = [
-                    {wch: 5}, {wch: 8}, {wch: 35}, {wch: 5}, {wch: 8}, {wch: 30}, {wch: 20}
-                ];
-
+                ws['!cols'] = [{wch: 5}, {wch: 8}, {wch: 35}, {wch: 35}, {wch: 5}, {wch: 8}, {wch: 10}, {wch: 30}, {wch: 20}];
                 XLSX.utils.book_append_sheet(wb, ws, "Data Peserta");
                 XLSX.writeFile(wb, fileName);
             } else {
-                // Formatting for XLS (Legacy HTML based)
                 let tableHtml = `
                     <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
                     <head><meta charset="UTF-8">
@@ -802,21 +826,22 @@
                         .header { background-color: #1d4ed8; color: #ffffff; font-weight: bold; border: 1px solid #000; text-align: center; }
                         td { border: 1px solid #ccc; padding: 5px; }
                         .center { text-align: center; }
-                        .bold { font-weight: bold; }
                     </style>
                     </head>
                     <body>
                     <table>
-                        <tr><th colspan="7" class="title">DAFTAR PESERTA KONKERPROV I PGRI BANTEN</th></tr>
-                        <tr><th colspan="7" style="text-align:center">Developed by Edi Brata - Diunduh pada: ${now.toLocaleString('id-ID')}</th></tr>
-                        <tr><td colspan="7"></td></tr>
+                        <tr><th colspan="9" class="title">DAFTAR PESERTA KONKERPROV I PGRI BANTEN</th></tr>
+                        <tr><th colspan="9" style="text-align:center">Developed by Edi Brata - Diunduh pada: ${now.toLocaleString('id-ID')}</th></tr>
+                        <tr><td colspan="9"></td></tr>
                         <thead>
                             <tr>
                                 <th class="header">No</th>
                                 <th class="header">Kamar</th>
                                 <th class="header">Nama Peserta</th>
+                                <th class="header">Kelompok</th>
                                 <th class="header">L/P</th>
                                 <th class="header">Kaos</th>
+                                <th class="header">Kunci</th>
                                 <th class="header">Utusan</th>
                                 <th class="header">WhatsApp</th>
                             </tr>
@@ -827,10 +852,12 @@
                     tableHtml += `
                         <tr>
                             <td class="center">${p.no}</td>
-                            <td class="center bold" style="color: #1d4ed8">${p.kamar || '-'}</td>
+                            <td class="center" style="font-weight:bold">${p.kamar || '-'}</td>
                             <td>${p.nama}</td>
+                            <td>${p.kelompok || '-'}</td>
                             <td class="center">${p.jk}</td>
                             <td class="center">${p.ukuran}</td>
+                            <td class="center">${p.kunci || '-'}</td>
                             <td>${p.utusan}</td>
                             <td class="center">${p.wa || '-'}</td>
                         </tr>`;
@@ -858,7 +885,18 @@
 
         // --- FIREBASE SYNC & INITIALIZATION ---
         const initAuth = async () => {
-            try { await signInAnonymously(auth); } catch (err) { console.error("Auth Failure:", err); }
+            try { 
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    try {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } catch (tokenErr) {
+                        // Jika token khusus gagal (mismatch), fallback ke login anonim
+                        await signInAnonymously(auth);
+                    }
+                } else {
+                    await signInAnonymously(auth); 
+                }
+            } catch (err) { console.error("Auth Failure:", err); }
         };
         initAuth();
 
@@ -886,7 +924,6 @@
             }
         });
 
-        // Setup Form Submit
         document.getElementById('participantForm').onsubmit = (e) => {
             e.preventDefault();
             window.saveParticipant();
